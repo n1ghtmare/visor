@@ -1,21 +1,35 @@
-// This should contain:
-// - No of starting karts
-// - No of total karts
-// - No of boxes
-
-// py-3 px-4 bg-white rounded-lg placeholder-gray-400 text-gray-900 appearance-none inline-block w-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600
-import Head from "next/head";
 import React from "react";
 import { useForm } from "react-hook-form";
+
+import Head from "next/head";
 
 import IconPlay from "components/Shared/IconPlay";
 import Input from "components/Shared/Input";
 
 type SetupInputs = {
+    raceName: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
     noOfBoxes: number;
 };
+
+async function createRace(data: SetupInputs): Promise<JSON> {
+    const response = await fetch("/api/race/create", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(response.status.toString());
+    }
+
+    const serverData = await response.json();
+
+    return serverData;
+}
 
 export default function Setup() {
     const {
@@ -53,6 +67,33 @@ export default function Setup() {
                 <h1 className="text-4xl font-bold">Setup Race</h1>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="mt-16">
+                    <div className="mt-4">
+                        <div className="flex items-baseline">
+                            <label
+                                className="flex-1 mb-2 font-bold text-gray-700"
+                                htmlFor="raceName"
+                            >
+                                What's the name of the race (event)?
+                            </label>
+
+                            {errors.raceName && (
+                                <span className="text-sm text-red-500">
+                                    {errors.raceName.message}
+                                </span>
+                            )}
+                        </div>
+                        <Input
+                            {...register("raceName", {
+                                required: "Required.",
+                                minLength: 2
+                            })}
+                            id="raceName"
+                            type="text"
+                            isInvalid={!!errors.raceName}
+                            placeholder="Name of race..."
+                        />
+                    </div>
+
                     <div className="mt-4">
                         <div className="flex items-baseline">
                             <label
