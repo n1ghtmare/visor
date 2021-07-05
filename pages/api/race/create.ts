@@ -8,18 +8,13 @@ import Kart from "entities/Kart";
 import ClassificationType from "entities/ClassificationType";
 import StatusType from "entities/StatusType";
 import Race from "entities/Race";
+import CreateRaceResponseData from "entities/CreateRaceResponseData";
 
 type RequestData = {
     raceName: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
     noOfBoxes: number;
-};
-
-type ResponseData = {
-    race: Race;
-    boxes: Box[];
-    karts: Kart[];
 };
 
 const NO_OF_POSSIBLE_COLORS = 256 ** 3;
@@ -150,7 +145,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const race: Race = await createRace(requestData.raceName, MOCK_USER_ID);
 
-        let responseData: ResponseData = {
+        let responseData: CreateRaceResponseData = {
             race,
             boxes: await createBoxes(race.id, requestData.noOfBoxes),
             karts: await createKarts(

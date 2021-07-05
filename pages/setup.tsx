@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Head from "next/head";
 
 import IconPlay from "components/Shared/IconPlay";
 import Input from "components/Shared/Input";
+import CreateRaceResponseData from "entities/CreateRaceResponseData";
+import { useRouter } from "next/dist/client/router";
 
 type SetupInputs = {
     raceName: string;
@@ -39,7 +41,13 @@ export default function Setup() {
         formState: { errors }
     } = useForm<SetupInputs>();
 
+    const router = useRouter();
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
     async function onSubmit(data: SetupInputs) {
+        setIsLoading(true);
+
         const response = await fetch("/api/race/create", {
             method: "POST",
             body: JSON.stringify(data),
@@ -52,8 +60,12 @@ export default function Setup() {
             throw new Error(response.status.toString());
         }
 
-        const serverData = await response.json();
-        console.log({ serverData });
+        setIsLoading(false);
+        const serverData = (await response.json()) as CreateRaceResponseData;
+        // TODO: Put this into SWR instead of re-fetching it again
+
+        // Redirect to the race/index page
+        router.push("/race");
     }
 
     return (
@@ -63,7 +75,7 @@ export default function Setup() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <div className="w-1/4">
+            <main className="w-1/4">
                 <h1 className="text-4xl font-bold">Setup Race</h1>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="mt-16">
@@ -194,15 +206,18 @@ export default function Setup() {
                     </div>
                     <div className="mt-8">
                         <button
-                            className="flex items-center px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-700 space-x-2 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             type="submit"
+                            className={`flex items-center px-4 py-2 font-bold text-white bg-blue-600 rounded space-x-2 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50 ${
+                                isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
+                            }`}
+                            disabled={isLoading}
                         >
                             <IconPlay />
-                            <span>Continue</span>
+                            {isLoading ? <span>Creating race...</span> : <span>Continue</span>}
                         </button>
                     </div>
                 </form>
-            </div>
+            </main>
         </>
     );
 }

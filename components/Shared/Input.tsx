@@ -10,6 +10,7 @@ type InputProps = {
     autoComplete?: string;
     value?: string;
     placeholder?: string;
+    disabled?: boolean;
 };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
@@ -24,6 +25,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
             onBlur={props.onBlur}
             autoComplete={props.autoComplete}
             placeholder={props.placeholder}
+            disabled={props.disabled}
             className={`w-full px-4 py-2 bg-white border rounded focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
                 props.isInvalid
                     ? "border-red-500 focus:ring-red-500 placeholder-red-400"
