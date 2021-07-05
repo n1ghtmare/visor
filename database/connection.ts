@@ -1,4 +1,5 @@
 import sqlite3, { Database } from "sqlite3";
+import { open } from "sqlite";
 
 // TODO: Add races and users table, where the races will be owned by a user_id
 const CREATE_USERS_TABLE_SQL = `
@@ -48,28 +49,101 @@ const CREATE_KARTS_TABLE_SQL = `
     )
 `;
 
-const db = new sqlite3.Database("./database/visor.db", (error: Error) => {
-    if (error) {
-        // TODO: Find a way to propery log the database errors in a file or other type of storage?
-        console.log(error);
-        throw error;
-    }
-});
+export default async function openConnection() {
+    return open({
+        filename: "./database/visor.db",
+        driver: sqlite3.Database
+    }).then(async (db) => {
+        await db.run("PRAGMA foreign_keys = ON");
 
-db.serialize(() => {
-    // enfore foreign key constraints
-    db.run("PRAGMA foreign_keys = ON");
+        // create tables if missing
+        await db.run(CREATE_USERS_TABLE_SQL);
+        await db.run(CREATE_RACES_TABLE_SQL);
+        await db.run(CREATE_BOXES_TABLE_SQL);
+        await db.run(CREATE_KARTS_TABLE_SQL);
 
-    // create tables if missing
-    db.run(CREATE_USERS_TABLE_SQL);
-    db.run(CREATE_RACES_TABLE_SQL);
-    db.run(CREATE_BOXES_TABLE_SQL);
-    db.run(CREATE_KARTS_TABLE_SQL);
+        // Run this the first time only (we should provide a mechanism to register new users at a later stage)
+        await db.run(
+            `INSERT OR IGNORE INTO users (
+                id,
+                username,
+                password,
+                display_name
+            )
+            VALUES (
+                1,
+                'test_username',
+                '$2y$12$A/nKPxRAgjWFmE4Rj0TFwuD6/4NwVrHjFeueLJp4slkowrcmy.GF6',
+                'test_display_name'
+            )`
+        );
 
-    // Run this the first time only
-    db.run(
-        "INSERT INTO users (username, password, display_name) VALUES ('test_username', '$2y$12$A/nKPxRAgjWFmE4Rj0TFwuD6/4NwVrHjFeueLJp4slkowrcmy.GF6', 'test_display_name')"
-    );
-});
+        return db;
+    });
+}
 
-export default db;
+//const db = open({ filename: "./database/visor.db", driver: sqlite3.Database }).then(async (db) => {
+//    await db.run("PRAGMA foreign_keys = ON");
+//
+//    // create tables if missing
+//    await db.run(CREATE_USERS_TABLE_SQL);
+//    await db.run(CREATE_RACES_TABLE_SQL);
+//    await db.run(CREATE_BOXES_TABLE_SQL);
+//    await db.run(CREATE_KARTS_TABLE_SQL);
+//
+//    // Run this the first time only (we should provide a mechanism to register new users at a later stage)
+//    await db.run(
+//        `INSERT OR IGNORE INTO users (
+//            id,
+//            username,
+//            password,
+//            display_name
+//        )
+//        VALUES (
+//            1,
+//            'test_username',
+//            '$2y$12$A/nKPxRAgjWFmE4Rj0TFwuD6/4NwVrHjFeueLJp4slkowrcmy.GF6',
+//            'test_display_name'
+//        )`
+//    );
+//    return db;
+//});
+//
+//export default db;
+
+//const db = new sqlite3.Database("./database/visor.db", (error: Error) => {
+//    if (error) {
+//        // TODO: Find a way to propery log the database errors in a file or other type of storage?
+//        console.log(error);
+//        throw error;
+//    }
+//});
+//
+//db.serialize(() => {
+//    // enfore foreign key constraints
+//    db.run("PRAGMA foreign_keys = ON");
+//
+//    // create tables if missing
+//    db.run(CREATE_USERS_TABLE_SQL);
+//    db.run(CREATE_RACES_TABLE_SQL);
+//    db.run(CREATE_BOXES_TABLE_SQL);
+//    db.run(CREATE_KARTS_TABLE_SQL);
+//
+//    // Run this the first time only (we should provide a mechanism to register new users at a later stage)
+//    db.run(
+//        `INSERT OR IGNORE INTO users (
+//            id,
+//            username,
+//            password,
+//            display_name
+//        )
+//        VALUES (
+//            1,
+//            'test_username',
+//            '$2y$12$A/nKPxRAgjWFmE4Rj0TFwuD6/4NwVrHjFeueLJp4slkowrcmy.GF6',
+//            'test_display_name'
+//        )`
+//    );
+//});
+//
+//export default db;

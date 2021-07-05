@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
 
-import db from "database/connection";
+import openConnection from "database/connection";
 
 import Box from "entities/Box";
 import Kart from "entities/Kart";
@@ -28,10 +28,12 @@ const getRandomColorHex = (): string =>
     `#${Math.floor(Math.random() * NO_OF_POSSIBLE_COLORS).toString(16)}`;
 
 // TODO: Do better error handling here...
-function createBoxes(raceId: number, noOfBoxes: number): Box[] {
+async function createBoxes(raceId: number, noOfBoxes: number): Promise<Box[]> {
     const boxes: Box[] = [];
 
-    let stmt = db.prepare(
+    const db = await openConnection();
+
+    let stmt = await db.prepare(
         "INSERT INTO boxes VALUES ($id, $raceId, $name, $colorHex, $description)"
     );
 
@@ -44,7 +46,7 @@ function createBoxes(raceId: number, noOfBoxes: number): Box[] {
             description: null
         };
 
-        stmt.run({
+        await stmt.bind({
             $id: box.id,
             $raceId: box.raceId,
             $name: box.name,
@@ -55,15 +57,22 @@ function createBoxes(raceId: number, noOfBoxes: number): Box[] {
         boxes.push(box);
     }
 
-    stmt.finalize();
+    await stmt.finalize();
+    await db.close();
 
     return boxes;
 }
 
-function createKarts(raceId: number, noOfTotalKarts: number, noOfStartingKarts: number): Kart[] {
+async function createKarts(
+    raceId: number,
+    noOfTotalKarts: number,
+    noOfStartingKarts: number
+): Promise<Kart[]> {
     const karts: Kart[] = [];
 
-    let stmt = db.prepare(
+    const db = await openConnection();
+
+    let stmt = await db.prepare(
         `INSERT INTO karts VALUES (
             $id,
             $raceId,
@@ -89,7 +98,7 @@ function createKarts(raceId: number, noOfTotalKarts: number, noOfStartingKarts: 
             kart.statusType = StatusType.Racing;
         }
 
-        stmt.run({
+        await stmt.bind({
             $id: kart.id,
             $raceId: kart.raceId,
             $statusType: kart.statusType,
@@ -103,12 +112,13 @@ function createKarts(raceId: number, noOfTotalKarts: number, noOfStartingKarts: 
         karts.push(kart);
     }
 
-    stmt.finalize();
+    await stmt.finalize();
+    await db.close();
 
     return karts;
 }
 
-function createRace(name: string, userId: number): Race {
+async function createRace(name: string, userId: number): Promise<Race> {
     let race: Race = {
         id: null,
         name,
@@ -116,22 +126,17 @@ function createRace(name: string, userId: number): Race {
         createdOnDate: new Date()
     };
 
+    const db = await openConnection();
+
     // TODO: We need to test this here (are the dates in the correct UTC ISO8601 format)
-    db.run(
+    const result = await db.run(
         "INSERT INTO races (name, created_by_user_id, created_on_date) VALUES (?, ?, ?)",
-        [name, userId, race.createdOnDate.toISOString()],
-        function (error: Error) {
-            if (error) {
-                console.log("Couldn't insert into table races: ", error);
-                throw error;
-            }
-
-            console.log("lastID: ", this.lastID);
-
-            // FIXME: This doesn't update the id correctly it's working in a closure
-            race.id = this.lastID;
-        }
+        [name, userId, race.createdOnDate.toISOString()]
     );
+
+    await db.close();
+
+    race.id = result.lastID;
 
     return race;
 }
@@ -139,17 +144,20 @@ function createRace(name: string, userId: number): Race {
 // TODO: needs to be removed and we need to get it from the session
 const MOCK_USER_ID = 1;
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         const requestData = req.body as RequestData;
 
-        const race: Race = createRace(requestData.raceName, MOCK_USER_ID);
-        console.log("Race created: ", { race });
+        const race: Race = await createRace(requestData.raceName, MOCK_USER_ID);
 
         let responseData: ResponseData = {
             race,
-            boxes: createBoxes(race.id, requestData.noOfBoxes),
-            karts: createKarts(race.id, requestData.noOfTotalKarts, requestData.noOfStartingKarts)
+            boxes: await createBoxes(race.id, requestData.noOfBoxes),
+            karts: await createKarts(
+                race.id,
+                requestData.noOfTotalKarts,
+                requestData.noOfStartingKarts
+            )
         };
 
         res.status(200).json(responseData);
