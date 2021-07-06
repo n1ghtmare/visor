@@ -7,11 +7,11 @@ import Box from "entities/Box";
 import Kart from "entities/Kart";
 import ClassificationType from "entities/ClassificationType";
 import StatusType from "entities/StatusType";
-import Race from "entities/Race";
-import CreateRaceResponseData from "entities/CreateRaceResponseData";
+import Event from "entities/Event";
+import CreateEventResponseData from "entities/CreateEventResponseData";
 
 type RequestData = {
-    raceName: string;
+    eventName: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
     noOfBoxes: number;
@@ -23,27 +23,27 @@ const getRandomColorHex = (): string =>
     `#${Math.floor(Math.random() * NO_OF_POSSIBLE_COLORS).toString(16)}`;
 
 // TODO: Do better error handling here...
-async function createBoxes(raceId: number, noOfBoxes: number): Promise<Box[]> {
+async function createBoxes(eventId: number, noOfBoxes: number): Promise<Box[]> {
     const boxes: Box[] = [];
 
     const db = await openConnection();
 
     let stmt = await db.prepare(
-        "INSERT INTO boxes VALUES ($id, $raceId, $name, $colorHex, $description)"
+        "INSERT INTO boxes VALUES ($id, $eventId, $name, $colorHex, $description)"
     );
 
     for (let i = 0; i < noOfBoxes; i++) {
         var box: Box = {
             id: uuidv4(),
-            raceId,
+            eventId,
             name: `Box ${i + 1}`,
             colorHex: getRandomColorHex(),
             description: null
         };
 
-        await stmt.bind({
+        await stmt.run({
             $id: box.id,
-            $raceId: box.raceId,
+            $eventId: box.eventId,
             $name: box.name,
             $colorHex: box.colorHex,
             $description: null
@@ -59,7 +59,7 @@ async function createBoxes(raceId: number, noOfBoxes: number): Promise<Box[]> {
 }
 
 async function createKarts(
-    raceId: number,
+    eventId: number,
     noOfTotalKarts: number,
     noOfStartingKarts: number
 ): Promise<Kart[]> {
@@ -70,10 +70,10 @@ async function createKarts(
     let stmt = await db.prepare(
         `INSERT INTO karts VALUES (
             $id,
-            $raceId,
+            $eventId,
             $statusType,
-            $raceNo,
-            $previousRaceNo,
+            $eventNo,
+            $previousEventNo,
             $classificationType,
             $boxId,
             $markdownNotes
@@ -83,22 +83,22 @@ async function createKarts(
     for (let i = 0; i < noOfTotalKarts; i++) {
         var kart: Kart = {
             id: uuidv4(),
-            raceId,
+            eventId: eventId,
             statusType: StatusType.Idle,
             classificationType: ClassificationType.Normal
         };
 
         if (i < noOfStartingKarts) {
-            kart.raceNo = i + 1;
+            kart.eventNo = i + 1;
             kart.statusType = StatusType.Racing;
         }
 
-        await stmt.bind({
+        await stmt.run({
             $id: kart.id,
-            $raceId: kart.raceId,
+            $eventId: kart.eventId,
             $statusType: kart.statusType,
-            $raceNo: kart.raceNo,
-            $previousRaceNo: kart.previousRaceNo,
+            $eventNo: kart.eventNo,
+            $previousEventNo: kart.previousEventNo,
             $classificationType: kart.classificationType,
             $boxId: kart.boxId,
             $markdownNotes: kart.markdownNotes
@@ -113,8 +113,8 @@ async function createKarts(
     return karts;
 }
 
-async function createRace(name: string, userId: number): Promise<Race> {
-    let race: Race = {
+async function createEvent(name: string, userId: number): Promise<Event> {
+    let event: Event = {
         id: null,
         name,
         createdByUserId: userId,
@@ -125,15 +125,15 @@ async function createRace(name: string, userId: number): Promise<Race> {
 
     // TODO: We need to test this here (are the dates in the correct UTC ISO8601 format)
     const result = await db.run(
-        "INSERT INTO races (name, created_by_user_id, created_on_date) VALUES (?, ?, ?)",
-        [name, userId, race.createdOnDate.toISOString()]
+        "INSERT INTO events (name, created_by_user_id, created_on_date) VALUES (?, ?, ?)",
+        [name, userId, event.createdOnDate.toISOString()]
     );
 
     await db.close();
 
-    race.id = result.lastID;
+    event.id = result.lastID;
 
-    return race;
+    return event;
 }
 
 // TODO: needs to be removed and we need to get it from the session
@@ -143,13 +143,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === "POST") {
         const requestData = req.body as RequestData;
 
-        const race: Race = await createRace(requestData.raceName, MOCK_USER_ID);
+        const event: Event = await createEvent(requestData.eventName, MOCK_USER_ID);
 
-        let responseData: CreateRaceResponseData = {
-            race,
-            boxes: await createBoxes(race.id, requestData.noOfBoxes),
+        let responseData: CreateEventResponseData = {
+            event,
+            boxes: await createBoxes(event.id, requestData.noOfBoxes),
             karts: await createKarts(
-                race.id,
+                event.id,
                 requestData.noOfTotalKarts,
                 requestData.noOfStartingKarts
             )

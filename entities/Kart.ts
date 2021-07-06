@@ -3,10 +3,10 @@ import StatusType from "./StatusType";
 
 type Kart = {
     id: string;
-    raceId: number;
+    eventId: number;
     statusType: StatusType;
-    raceNo?: number;
-    previousRaceNo?: number;
+    eventNo?: number;
+    previousEventNo?: number;
     classificationType: ClassificationType;
     boxId?: string;
     markdownNotes?: string;

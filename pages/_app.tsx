@@ -2,11 +2,12 @@ import "tailwindcss/tailwind.css";
 
 import type { AppProps } from "next/app";
 
-function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <Component {...pageProps} />
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200">
+            <div className="mx-4 lg:mx-auto lg:w-8/12">
+                <Component {...pageProps} />
+            </div>
         </div>
     );
 }
-export default MyApp;

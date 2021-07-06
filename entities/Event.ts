@@ -1,8 +1,8 @@
-type Race = {
+type Event = {
     id: number;
     name: string;
     createdByUserId: number;
     createdOnDate: Date;
 };
 
-export default Race;
+export default Event;

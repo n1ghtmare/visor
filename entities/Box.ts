@@ -1,6 +1,6 @@
 type Box = {
     id: string;
-    raceId: number;
+    eventId: number;
     name: string;
     colorHex: string;
     description?: string;
