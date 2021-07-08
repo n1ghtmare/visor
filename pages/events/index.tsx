@@ -1,9 +1,9 @@
 import Head from "next/head";
-import useSWR from "swr";
 
-import fetcher from "helpers/fetcher";
-import EventSummary from "entities/EventSummary";
+import { useEventsComposite } from "hooks/EventHooks";
 
+import LoadingIndicator from "components/Shared/LoadingIndicator";
+import RefetchingIndicator from "components/Shared/RefetchingIndicator";
 import EventsTable from "components/EventsTable";
 import EventsTableBody from "components/EventsTable/EventsTableBody";
 import EventsTableEmptyRow from "components/EventsTable/EventsTableBody/EventsTableEmptyRow";
@@ -12,10 +12,10 @@ import EventsTableFooter from "components/EventsTable/EventsTableFooter";
 import EventsTableHeader from "components/EventsTable/EventsTableHeader";
 
 export default function Index() {
-    const { data, error } = useSWR<EventSummary[]>("/api/event", fetcher);
+    const { events, isLoading, isError, isValidating } = useEventsComposite();
 
-    if (error) return <div>Failed to load</div>;
-    if (!data) return <div>Loading...</div>;
+    if (isError) return <div>Failed to load data...</div>;
+    if (isLoading) return <LoadingIndicator />;
 
     return (
         <>
@@ -29,12 +29,12 @@ export default function Index() {
 
                 <div className="mt-12">
                     <EventsTable>
-                        {data.length > 0 && <EventsTableHeader />}
+                        {events.length > 0 && <EventsTableHeader />}
                         <EventsTableBody>
-                            {data.length === 0 ? (
+                            {events.length === 0 ? (
                                 <EventsTableEmptyRow />
                             ) : (
-                                data.map((x) => (
+                                events.map((x) => (
                                     <EventsTableRow
                                         key={x.id}
                                         name={x.name}
@@ -51,6 +51,7 @@ export default function Index() {
                         <EventsTableFooter />
                     </EventsTable>
                 </div>
+                {isValidating && <RefetchingIndicator />}
             </main>
         </>
     );

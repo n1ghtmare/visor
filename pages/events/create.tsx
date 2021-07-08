@@ -6,17 +6,21 @@ import { useRouter } from "next/dist/client/router";
 
 import IconPlay from "components/Shared/IconPlay";
 import Input from "components/Shared/Input";
-import CreateEventResponseData from "entities/CreateEventResponseData";
+import PostEventResponseData from "entities/PostEventResponseData";
+import { mutate } from "swr";
+import EventComposite from "entities/EventComposite";
+import StatusType from "entities/StatusType";
+import Kart from "entities/Kart";
 
 type CreateFormInputs = {
-    eventName: string;
+    name: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
     noOfBoxes: number;
 };
 
-async function createEvent(data: CreateFormInputs): Promise<CreateEventResponseData> {
-    const response = await fetch("/api/event/create", {
+async function createEvent(data: CreateFormInputs): Promise<PostEventResponseData> {
+    const response = await fetch("/api/events", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -30,7 +34,20 @@ async function createEvent(data: CreateFormInputs): Promise<CreateEventResponseD
 
     const serverData = await response.json();
 
-    return serverData as CreateEventResponseData;
+    return serverData as PostEventResponseData;
+}
+
+function groupedMapByStatusType(karts: Kart[]): Map<StatusType, Kart[]> {
+    let initialMap = new Map<StatusType, Kart[]>();
+    initialMap.set(StatusType.Racing, []);
+    initialMap.set(StatusType.Idle, []);
+    initialMap.set(StatusType.Box, []);
+
+    return karts.reduce(
+        (map: Map<StatusType, Kart[]>, kart) =>
+            map.set(kart.statusType, [...(map.get(kart.statusType) || []), kart]),
+        initialMap
+    );
 }
 
 export default function Setup() {
@@ -48,14 +65,32 @@ export default function Setup() {
     async function onSubmit(data: CreateFormInputs) {
         setIsLoading(true);
 
-        const response: CreateEventResponseData = await createEvent(data);
+        // When creating a new event push it to the cache and re-validate entries (we already have it in the response)
+        await mutate("/api/events/composite", async (events: EventComposite[]) => {
+            const { event, karts, boxes } = await createEvent(data);
+            const grouped: Map<StatusType, Kart[]> = groupedMapByStatusType(karts);
+
+            if (!events) {
+                // there are no previous events here, that means we need to refetch them
+                return events;
+            }
+
+            return [
+                ...events,
+                {
+                    ...event,
+                    noOfKartsTotal: karts.length,
+                    noOfKartsInRace: grouped.get(StatusType.Racing).length,
+                    noOfKartsIdle: grouped.get(StatusType.Idle).length,
+                    noOfKartsInBox: grouped.get(StatusType.Box).length,
+                    noOfBoxes: boxes.length
+                }
+            ];
+        });
 
         setIsLoading(false);
 
-        // TODO: Put this into SWR instead of re-fetching it again
-
-        // Redirect to the event/index page
-        router.push("/event");
+        router.push("/events");
     }
 
     return (
@@ -78,25 +113,25 @@ export default function Setup() {
                                 <div className="flex items-baseline">
                                     <label
                                         className="flex-1 mb-2 font-bold text-gray-700"
-                                        htmlFor="eventName"
+                                        htmlFor="name"
                                     >
                                         What's the name of the event?
                                     </label>
 
-                                    {errors.eventName && (
+                                    {errors.name && (
                                         <span className="text-sm text-red-500">
-                                            {errors.eventName.message}
+                                            {errors.name.message}
                                         </span>
                                     )}
                                 </div>
                                 <Input
-                                    {...register("eventName", {
+                                    {...register("name", {
                                         required: "Required.",
                                         minLength: 2
                                     })}
-                                    id="eventName"
+                                    id="name"
                                     type="text"
-                                    isInvalid={!!errors.eventName}
+                                    isInvalid={!!errors.name}
                                     placeholder="Name of event..."
                                 />
                             </div>

@@ -19,7 +19,7 @@ export default function Home() {
                 </p>
 
                 <div className="mt-12">
-                    <LinkButton href="/event">
+                    <LinkButton href="/events">
                         <IconArrowNarrowRight />
                         <span>View Events</span>
                     </LinkButton>

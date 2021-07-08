@@ -12,16 +12,16 @@ export default function EventsTableRow(props: {
 }) {
     return (
         <tr className="hover:bg-blue-50 hover:cursor-pointer">
-            <td className="px-6 py-3 font-medium text-left whitespace-nowrap">
+            <td className="px-6 py-3 font-medium text-left">
                 <a href="#" className="text-blue-600 hover:text-blue-900">
                     {props.name}
                 </a>
             </td>
-            <td className="px-6 py-4 whitespace-nowrap">{props.noOfKartsTotal}</td>
-            <td className="px-6 py-4 whitespace-nowrap">{props.noOfKartsInRace}</td>
-            <td className="px-6 py-4 whitespace-nowrap">{props.noOfKartsInBox}</td>
-            <td className="px-6 py-4 whitespace-nowrap">{props.noOfKartsIdle}</td>
-            <td className="px-6 py-4 whitespace-nowrap">{props.noOfBoxes}</td>
+            <td className="px-6 py-4 text-center whitespace-nowrap">{props.noOfKartsTotal}</td>
+            <td className="px-6 py-4 text-center whitespace-nowrap">{props.noOfKartsInRace}</td>
+            <td className="px-6 py-4 text-center whitespace-nowrap">{props.noOfKartsInBox}</td>
+            <td className="px-6 py-4 text-center whitespace-nowrap">{props.noOfKartsIdle}</td>
+            <td className="px-6 py-4 text-center whitespace-nowrap">{props.noOfBoxes}</td>
             <td className="px-6 py-4 whitespace-nowrap">
                 {generateTimestampText(props.createdOnDate)}
             </td>

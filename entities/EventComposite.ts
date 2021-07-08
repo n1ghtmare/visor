@@ -1,4 +1,4 @@
-type EventSummary = {
+type EventComposite = {
     id: number;
     name: string;
     noOfKartsTotal: number;
@@ -10,4 +10,4 @@ type EventSummary = {
     createdOnDate: Date;
 };
 
-export default EventSummary;
+export default EventComposite;

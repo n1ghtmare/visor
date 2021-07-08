@@ -1,29 +1,21 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
 
-import openConnection from "database/connection";
+import openConnection from "./connection";
 
-import Box from "entities/Box";
-import Kart from "entities/Kart";
-import ClassificationType from "entities/ClassificationType";
-import StatusType from "entities/StatusType";
 import Event from "entities/Event";
-import CreateEventResponseData from "entities/CreateEventResponseData";
-
-type RequestData = {
-    eventName: string;
-    noOfTotalKarts: number;
-    noOfStartingKarts: number;
-    noOfBoxes: number;
-};
+import Box from "entities/Box";
+import ClassificationType from "entities/ClassificationType";
+import Kart from "entities/Kart";
+import StatusType from "entities/StatusType";
+import EventComposite from "entities/EventComposite";
 
 const NO_OF_POSSIBLE_COLORS = 256 ** 3;
 
+// FIXME: There is an issue here that this code produces shorter character colors (such as for example: #ffff)
 const getRandomColorHex = (): string =>
     `#${Math.floor(Math.random() * NO_OF_POSSIBLE_COLORS).toString(16)}`;
 
-// TODO: Do better error handling here...
-async function createBoxes(eventId: number, noOfBoxes: number): Promise<Box[]> {
+export async function createBoxes(eventId: number, noOfBoxes: number): Promise<Box[]> {
     const boxes: Box[] = [];
 
     const db = await openConnection();
@@ -58,7 +50,7 @@ async function createBoxes(eventId: number, noOfBoxes: number): Promise<Box[]> {
     return boxes;
 }
 
-async function createKarts(
+export async function createKarts(
     eventId: number,
     noOfTotalKarts: number,
     noOfStartingKarts: number
@@ -113,7 +105,7 @@ async function createKarts(
     return karts;
 }
 
-async function createEvent(name: string, userId: number): Promise<Event> {
+export async function createEvent(name: string, userId: number): Promise<Event> {
     let event: Event = {
         id: null,
         name,
@@ -136,27 +128,26 @@ async function createEvent(name: string, userId: number): Promise<Event> {
     return event;
 }
 
-// TODO: needs to be removed and we need to get it from the session
-const MOCK_USER_ID = 1;
+export async function getEvents(userId: number): Promise<EventComposite[]> {
+    const db = await openConnection();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method === "POST") {
-        const requestData = req.body as RequestData;
+    const result = await db.all(
+        `SELECT
+            e.id,
+            e.name,
+            (SELECT COUNT(id) FROM karts WHERE event_id = e.id) AS noOfKartsTotal,
+            (SELECT COUNT(id) FROM karts WHERE status_type_id = 2 AND event_id = e.id) AS noOfKartsInRace,
+            (SELECT COUNT(id) FROM karts WHERE status_type_id = 3 AND event_id = e.id) AS noOfKartsInBox,
+            (SELECT COUNT(id) FROM karts WHERE status_type_id = 1 AND event_id = e.id) AS noOfKartsIdle,
+            (SELECT COUNT(id) FROM boxes WHERE event_id = e.id) AS noOfBoxes,
+            created_by_user_id AS createdByUserId,
+            created_on_date AS createdOnDate
+        FROM events AS e
+        WHERE e.created_by_user_id = ?`,
+        [userId]
+    );
 
-        const event: Event = await createEvent(requestData.eventName, MOCK_USER_ID);
+    await db.close();
 
-        let responseData: CreateEventResponseData = {
-            event,
-            boxes: await createBoxes(event.id, requestData.noOfBoxes),
-            karts: await createKarts(
-                event.id,
-                requestData.noOfTotalKarts,
-                requestData.noOfStartingKarts
-            )
-        };
-
-        res.status(200).json(responseData);
-    } else {
-        res.status(405).json({ message: "Method not allowed" });
-    }
+    return result as EventComposite[];
 }

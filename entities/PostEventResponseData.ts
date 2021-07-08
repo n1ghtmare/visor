@@ -2,10 +2,10 @@ import Box from "./Box";
 import Kart from "./Kart";
 import Event from "./Event";
 
-type CreateEventResponseData = {
+type PostEventResponseData = {
     event: Event;
     boxes: Box[];
     karts: Kart[];
 };
 
-export default CreateEventResponseData;
+export default PostEventResponseData;

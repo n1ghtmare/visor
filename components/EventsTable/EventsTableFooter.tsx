@@ -6,7 +6,7 @@ export default function EventsTableFooter() {
         <tfoot className="bg-gray-50">
             <tr>
                 <td colSpan={8} className="px-6 py-3">
-                    <LinkButton href="/event/create">
+                    <LinkButton href="/events/create">
                         <IconPlusCircle />
                         <span>Create Event</span>
                     </LinkButton>
