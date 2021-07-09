@@ -1,6 +1,7 @@
 import Head from "next/head";
+import { mutate } from "swr";
 
-import { useEventsComposite } from "hooks/EventHooks";
+import { useEventComposites } from "hooks/EventHooks";
 
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";
@@ -11,8 +12,36 @@ import EventsTableRow from "components/EventsTable/EventsTableBody/EventsTableRo
 import EventsTableFooter from "components/EventsTable/EventsTableFooter";
 import EventsTableHeader from "components/EventsTable/EventsTableHeader";
 
+async function deleteEvent(id: number): Promise<void> {
+    const response = await fetch(`/api/events/${id}`, {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(response.status.toString());
+    }
+
+    await response.json();
+}
+
 export default function Index() {
-    const { events, isLoading, isError, isValidating } = useEventsComposite();
+    const { events, isLoading, isError, isValidating } = useEventComposites();
+
+    async function handleDeleteConfirm(id: number) {
+        mutate(
+            "/api/events/composite",
+            events.filter((x) => x.id !== id),
+            false
+        );
+
+        await deleteEvent(id);
+
+        mutate("/api/events/composite");
+    }
 
     if (isError) return <div>Failed to load data...</div>;
     if (isLoading) return <LoadingIndicator />;
@@ -37,13 +66,8 @@ export default function Index() {
                                 events.map((x) => (
                                     <EventsTableRow
                                         key={x.id}
-                                        name={x.name}
-                                        noOfKartsInBox={x.noOfKartsInBox}
-                                        noOfKartsInRace={x.noOfKartsInRace}
-                                        noOfKartsIdle={x.noOfKartsIdle}
-                                        noOfBoxes={x.noOfBoxes}
-                                        noOfKartsTotal={x.noOfKartsTotal}
-                                        createdOnDate={x.createdOnDate}
+                                        event={x}
+                                        onDeleteConfirm={handleDeleteConfirm}
                                     />
                                 ))
                             )}

@@ -128,7 +128,37 @@ export async function createEvent(name: string, userId: number): Promise<Event> 
     return event;
 }
 
-export async function getEvents(userId: number): Promise<EventComposite[]> {
+export async function deleteEvent(id: number): Promise<void> {
+    const db = await openConnection();
+
+    // TODO: Add a DB contstraint that would do cascade on delete
+    await db.run("DELETE FROM karts WHERE event_id = ?", [id]);
+    await db.run("DELETE FROM boxes WHERE event_id = ?", [id]);
+    await db.run("DELETE FROM events WHERE id = ?", [id]);
+
+    await db.close();
+}
+
+export async function getEventById(id: number): Promise<Event> {
+    const db = await openConnection();
+
+    const result = await db.get(
+        `SELECT
+            id,
+            name,
+            created_by_user_id AS createdByUserId,
+            created_on_date AS createdOnDate
+        FROM events
+        WHERE id = ?`,
+        [id]
+    );
+
+    await db.close();
+
+    return result as Event;
+}
+
+export async function getEventComposites(userId: number): Promise<EventComposite[]> {
     const db = await openConnection();
 
     const result = await db.all(

@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { mutate } from "swr";
 
 import Head from "next/head";
-import { useRouter } from "next/dist/client/router";
+import { useRouter } from "next/router";
 
 import IconPlay from "components/Shared/IconPlay";
 import Input from "components/Shared/Input";
 import PostEventResponseData from "entities/PostEventResponseData";
-import { mutate } from "swr";
 import EventComposite from "entities/EventComposite";
 import StatusType from "entities/StatusType";
 import Kart from "entities/Kart";
+import Button from "components/Shared/Button";
 
 type CreateFormInputs = {
     name: string;
@@ -38,7 +39,7 @@ async function createEvent(data: CreateFormInputs): Promise<PostEventResponseDat
 }
 
 function groupedMapByStatusType(karts: Kart[]): Map<StatusType, Kart[]> {
-    let initialMap = new Map<StatusType, Kart[]>();
+    const initialMap = new Map<StatusType, Kart[]>();
     initialMap.set(StatusType.Racing, []);
     initialMap.set(StatusType.Idle, []);
     initialMap.set(StatusType.Box, []);
@@ -115,7 +116,7 @@ export default function Setup() {
                                         className="flex-1 mb-2 font-bold text-gray-700"
                                         htmlFor="name"
                                     >
-                                        What's the name of the event?
+                                        What&apos;s the name of the event?
                                     </label>
 
                                     {errors.name && (
@@ -237,18 +238,10 @@ export default function Setup() {
                             </div>
                         </div>
                         <div className="px-6 py-3 mt-4 bg-gray-50">
-                            <button
-                                type="submit"
-                                className={`flex items-center px-4 py-2 font-bold text-white bg-blue-600 rounded space-x-2 focus:outline-none focus:ring focus:ring-blue-500 focus:ring-opacity-50 ${
-                                    isLoading
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : "hover:bg-blue-700"
-                                }`}
-                                disabled={isLoading}
-                            >
+                            <Button type="submit" isDisabled={isLoading}>
                                 <IconPlay />
                                 {isLoading ? <span>Creating Event...</span> : <span>Continue</span>}
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </main>
