@@ -1,53 +1,12 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useRef } from "react";
+
+import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
 import Modal from "components/Modal";
 import ButtonDanger from "components/Shared/ButtonDanger";
 import ButtonOutline from "components/Shared/ButtonOutline";
 import IconBan from "components/Shared/IconBan";
 import IconExclamationCircle from "components/Shared/IconExclamationCircle";
-
-function useEscCancel(handler: () => void) {
-    useEffect(() => {
-        const handleKeydown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                handler();
-            }
-        };
-        document.addEventListener("keydown", handleKeydown);
-
-        return () => {
-            document.removeEventListener("keydown", handleKeydown);
-        };
-    }, [handler]);
-}
-
-// Detect a click that is outside of the refs passed to the hook and execute the callback (used for dropdowns and modals)
-export function useOutsideRefsClick(
-    refs: React.MutableRefObject<HTMLElement>[],
-    handler: () => void
-) {
-    useEffect(() => {
-        function listener(e: Event) {
-            const filteredRefs = refs.filter(
-                (x) => !x.current || x.current.contains(e.target as Node)
-            );
-
-            if (filteredRefs.length === 0) {
-                handler();
-            }
-        }
-
-        console.log({ refs });
-
-        document.addEventListener("mousedown", listener);
-        document.addEventListener("touchstart", listener);
-
-        return () => {
-            document.removeEventListener("mousedown", listener);
-            document.removeEventListener("touchstart", listener);
-        };
-    }, [refs, handler]);
-}
 
 export default function DeleteModal(props: {
     eventName: string;
