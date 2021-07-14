@@ -20,12 +20,12 @@ export async function createBoxes(eventId: number, noOfBoxes: number): Promise<B
 
     const db = await openConnection();
 
-    let stmt = await db.prepare(
+    const stmt = await db.prepare(
         "INSERT INTO boxes VALUES ($id, $eventId, $name, $colorHex, $description)"
     );
 
     for (let i = 0; i < noOfBoxes; i++) {
-        var box: Box = {
+        const box: Box = {
             id: uuidv4(),
             eventId,
             name: `Box ${i + 1}`,
@@ -59,7 +59,7 @@ export async function createKarts(
 
     const db = await openConnection();
 
-    let stmt = await db.prepare(
+    const stmt = await db.prepare(
         `INSERT INTO karts VALUES (
             $id,
             $eventId,
@@ -73,7 +73,7 @@ export async function createKarts(
     );
 
     for (let i = 0; i < noOfTotalKarts; i++) {
-        var kart: Kart = {
+        const kart: Kart = {
             id: uuidv4(),
             eventId: eventId,
             statusType: StatusType.Idle,
@@ -106,7 +106,7 @@ export async function createKarts(
 }
 
 export async function createEvent(name: string, userId: number): Promise<Event> {
-    let event: Event = {
+    const event: Event = {
         id: null,
         name,
         createdByUserId: userId,
@@ -180,4 +180,27 @@ export async function getEventComposites(userId: number): Promise<EventComposite
     await db.close();
 
     return result as EventComposite[];
+}
+
+export async function getKartsByEventId(eventId: number): Promise<Kart[]> {
+    const db = await openConnection();
+
+    const result = await db.all(
+        `SELECT
+            id,
+            event_id AS eventId,
+            status_type_id AS statusType,
+            event_no AS eventNo,
+            previous_event_no AS previousEventNo,
+            classification_type_id AS classificationType,
+            box_id AS boxId,
+            markdown_notes AS markdownNotes
+        FROM karts
+        WHERE event_id = ?`,
+        [eventId]
+    );
+
+    await db.close();
+
+    return result as Kart[];
 }

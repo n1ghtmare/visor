@@ -1,16 +1,68 @@
-import { useKarts } from "hooks/KartHooks";
-import { NextRouter, useRouter } from "next/router";
+import { GetStaticPropsContext } from "next";
+import Head from "next/head";
+import React from "react";
 
-export default function Event() {
-    const router: NextRouter = useRouter();
-    const { id } = router.query;
+import { useKarts } from "hooks/KartHooks";
+import { useEvent } from "hooks/EventHooks";
+
+import LoadingIndicator from "components/Shared/LoadingIndicator";
+import RefetchingIndicator from "components/Shared/RefetchingIndicator";
+
+export async function getServerSideProps(context: GetStaticPropsContext) {
+    // TODO: Should we validate the id and throw an error if it's not a number?
+    const { id } = context.params;
     const eventId = parseInt(id as string, 10);
 
     if (isNaN(eventId)) {
-        // TODO: Do we need to check this?
+        throw Error("Invalid id");
     }
 
-    const { karts, isLoading, isError, isValidating } = useKarts(eventId);
+    return {
+        props: { id: eventId }
+    };
+}
 
-    return <div>This is the page for a single event</div>;
+export default function EventDetails({ id }: { id: number }) {
+    console.log({ id });
+    const {
+        karts,
+        isLoading: isLoadingKarts,
+        isError: isErrorKarts,
+        isValidating: isValidatingKarts
+    } = useKarts(id);
+
+    const {
+        event,
+        isLoading: isLoadingEvent,
+        isError: isErrorEvent,
+        isValidating: isValidatingEvent
+    } = useEvent(id);
+
+    if (isErrorKarts || isErrorEvent) {
+        return (
+            <div className="text-center">
+                <strong>Error:</strong> Failed to load data...
+            </div>
+        );
+    }
+
+    if (isLoadingKarts || isLoadingEvent) {
+        return <LoadingIndicator />;
+    }
+
+    return (
+        <>
+            <Head>
+                <title>Visor - Event </title>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
+            <main role="main">
+                <h1 className="text-4xl font-bold tracking-tight">{event.name}</h1>
+                <div className="mt-12">
+                    <div>Karts will be displayed here</div>
+                </div>
+                {(isValidatingKarts || isValidatingEvent) && <RefetchingIndicator />}
+            </main>
+        </>
+    );
 }

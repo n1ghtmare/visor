@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { useState } from "react";
 
 import { generateTimestampText } from "helpers/timestamp";
@@ -6,7 +8,6 @@ import EventComposite from "entities/EventComposite";
 
 import IconTrash from "components/Shared/IconTrash";
 import DeleteModal from "./EventsTableRow/DeleteModal";
-import Link from "next/link";
 
 export default function EventsTableRow(props: {
     event: EventComposite;

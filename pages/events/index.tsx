@@ -43,7 +43,14 @@ export default function Index() {
         mutate("/api/events/composite");
     }
 
-    if (isError) return <div>Failed to load data...</div>;
+    if (isError) {
+        return (
+            <div className="text-center">
+                <strong>Error:</strong> Failed to load data...
+            </div>
+        );
+    }
+
     if (isLoading) return <LoadingIndicator />;
 
     return (
