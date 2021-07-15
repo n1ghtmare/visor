@@ -19,7 +19,7 @@ export function useEventComposites() {
 }
 
 export function useEvent(id: number) {
-    const { data, error, isValidating } = useSWR<Event>(`/api/events/${id}`, fetcher);
+    const { data, error, isValidating } = useSWR<Event>(id ? `/api/events/${id}` : null, fetcher);
 
     return {
         event: data,

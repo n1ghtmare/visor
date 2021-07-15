@@ -6,11 +6,11 @@ import { useEventComposites } from "hooks/EventHooks";
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";
 import EventsTable from "components/EventsTable";
-import EventsTableBody from "components/EventsTable/EventsTableBody";
-import EventsTableEmptyRow from "components/EventsTable/EventsTableBody/EventsTableEmptyRow";
-import EventsTableRow from "components/EventsTable/EventsTableBody/EventsTableRow";
-import EventsTableFooter from "components/EventsTable/EventsTableFooter";
-import EventsTableHeader from "components/EventsTable/EventsTableHeader";
+import EventsTableBody from "components/EventsTableBody";
+import EventsTableEmptyRow from "components/EventsTableEmptyRow";
+import EventsTableFooter from "components/EventsTableFooter";
+import EventsTableHeader from "components/EventsTableHeader";
+import EventsTableRow from "components/EventsTableRow";
 
 async function deleteEvent(id: number): Promise<void> {
     const response = await fetch(`/api/events/${id}`, {

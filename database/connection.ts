@@ -38,7 +38,7 @@ const CREATE_KARTS_TABLE_SQL = `
     CREATE TABLE IF NOT EXISTS karts (
         id TEXT PRIMARY KEY NOT NULL,
         event_id INTEGER NOT NULL,
-        status_type_id TEXT NOT NULL,
+        status_type_id INTEGER NOT NULL,
         event_no INTEGER,
         previous_event_no INTEGER,
         classification_type_id INTEGER,

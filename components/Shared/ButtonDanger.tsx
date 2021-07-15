@@ -1,4 +1,4 @@
-export default function Button(
+export default function ButtonDanger(
     props: React.PropsWithChildren<{
         title?: string;
         isDisabled?: boolean;
