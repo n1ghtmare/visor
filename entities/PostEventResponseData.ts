@@ -1,10 +1,10 @@
-import Box from "./Box";
+import Pit from "./Pit";
 import Kart from "./Kart";
 import Event from "./Event";
 
 type PostEventResponseData = {
     event: Event;
-    boxes: Box[];
+    pits: Pit[];
     karts: Kart[];
 };
 

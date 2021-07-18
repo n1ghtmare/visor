@@ -22,8 +22,8 @@ const CREATE_EVENTS_TABLE_SQL = `
     )
 `;
 
-const CREATE_BOXES_TABLE_SQL = `
-    CREATE TABLE IF NOT EXISTS boxes (
+const CREATE_PITS_TABLE_SQL = `
+    CREATE TABLE IF NOT EXISTS pits (
         id TEXT PRIMARY KEY NOT NULL,
         event_id INTEGER NOT NULL,
         name TEXT NOT NULL,
@@ -33,7 +33,7 @@ const CREATE_BOXES_TABLE_SQL = `
     )
 `;
 
-// -> Status will be an enum with the following elements -> Idle, Racing, Box
+// -> Status will be an enum with the following elements -> Idle, Racing, Pit
 const CREATE_KARTS_TABLE_SQL = `
     CREATE TABLE IF NOT EXISTS karts (
         id TEXT PRIMARY KEY NOT NULL,
@@ -42,9 +42,9 @@ const CREATE_KARTS_TABLE_SQL = `
         event_no INTEGER,
         previous_event_no INTEGER,
         classification_type_id INTEGER,
-        box_id TEXT,
+        pit_id TEXT,
         markdown_notes TEXT,
-        FOREIGN KEY(box_id) REFERENCES boxes(id),
+        FOREIGN KEY(pit_id) REFERENCES pits(id),
         FOREIGN KEY(event_id) REFERENCES events(id)
     )
 `;
@@ -59,7 +59,7 @@ export default async function openConnection() {
         // create tables if missing
         await db.run(CREATE_USERS_TABLE_SQL);
         await db.run(CREATE_EVENTS_TABLE_SQL);
-        await db.run(CREATE_BOXES_TABLE_SQL);
+        await db.run(CREATE_PITS_TABLE_SQL);
         await db.run(CREATE_KARTS_TABLE_SQL);
 
         // Run this the first time only (we should provide a mechanism to register new users at a later stage)

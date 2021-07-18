@@ -48,9 +48,9 @@ export default function EventsTableRow(props: {
                 </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfKartsTotal}</td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfKartsInRace}</td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfKartsInBox}</td>
+                <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfKartsInPit}</td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfKartsIdle}</td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfBoxes}</td>
+                <td className="px-6 py-4 text-center whitespace-nowrap">{event.noOfPits}</td>
                 <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
                     {generateTimestampText(event.createdOnDate)}
                 </td>

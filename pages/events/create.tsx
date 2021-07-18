@@ -5,19 +5,21 @@ import { mutate } from "swr";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import IconPlay from "components/Shared/IconPlay";
-import Input from "components/Shared/Input";
+import { groupedMapByStatusType } from "helpers/data";
+
 import PostEventResponseData from "entities/PostEventResponseData";
 import EventComposite from "entities/EventComposite";
 import StatusType from "entities/StatusType";
 import Kart from "entities/Kart";
 import Button from "components/Shared/Button";
+import Input from "components/Shared/Input";
+import IconPlay from "components/Shared/IconPlay";
 
 type CreateFormInputs = {
     name: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
-    noOfBoxes: number;
+    noOfPits: number;
 };
 
 async function createEvent(data: CreateFormInputs): Promise<PostEventResponseData> {
@@ -38,19 +40,6 @@ async function createEvent(data: CreateFormInputs): Promise<PostEventResponseDat
     return serverData as PostEventResponseData;
 }
 
-function groupedMapByStatusType(karts: Kart[]): Map<StatusType, Kart[]> {
-    const initialMap = new Map<StatusType, Kart[]>();
-    initialMap.set(StatusType.Racing, []);
-    initialMap.set(StatusType.Idle, []);
-    initialMap.set(StatusType.Box, []);
-
-    return karts.reduce(
-        (map: Map<StatusType, Kart[]>, kart) =>
-            map.set(kart.statusType, [...(map.get(kart.statusType) || []), kart]),
-        initialMap
-    );
-}
-
 export default function Setup() {
     const {
         register,
@@ -68,7 +57,7 @@ export default function Setup() {
 
         // When creating a new event push it to the cache and re-validate entries (we already have it in the response)
         await mutate("/api/events/composite", async (events: EventComposite[]) => {
-            const { event, karts, boxes } = await createEvent(data);
+            const { event, karts, pits } = await createEvent(data);
             const grouped: Map<StatusType, Kart[]> = groupedMapByStatusType(karts);
 
             if (!events) {
@@ -83,8 +72,8 @@ export default function Setup() {
                     noOfKartsTotal: karts.length,
                     noOfKartsInRace: grouped.get(StatusType.Racing).length,
                     noOfKartsIdle: grouped.get(StatusType.Idle).length,
-                    noOfKartsInBox: grouped.get(StatusType.Box).length,
-                    noOfBoxes: boxes.length
+                    noOfKartsInPit: grouped.get(StatusType.Pit).length,
+                    noOfPits: pits.length
                 }
             ];
         });
@@ -210,30 +199,30 @@ export default function Setup() {
                                 <div className="flex items-baseline">
                                     <label
                                         className="flex-1 mb-2 font-bold text-gray-700"
-                                        htmlFor="noOfBoxes"
+                                        htmlFor="noOfPits"
                                     >
-                                        How many boxes?
+                                        How many pits?
                                     </label>
 
-                                    {errors.noOfBoxes && (
+                                    {errors.noOfPits && (
                                         <span className="text-sm text-red-500">
-                                            {errors.noOfBoxes.message}
+                                            {errors.noOfPits.message}
                                         </span>
                                     )}
                                 </div>
                                 <Input
-                                    {...register("noOfBoxes", {
+                                    {...register("noOfPits", {
                                         required: "Required.",
                                         validate: {
                                             isNumber: (x) => !isNaN(x) || "Has to be a number.",
                                             isAboveMin: (x) => x >= 1 || "Has to be at least 1.",
-                                            isBelowMax: (x) => x <= 5 || "Too many boxes, max is 5."
+                                            isBelowMax: (x) => x <= 5 || "Too many pits, max is 5."
                                         }
                                     })}
-                                    id="noOfBoxes"
+                                    id="noOfPits"
                                     type="text"
-                                    isInvalid={!!errors.noOfBoxes}
-                                    placeholder="No. of boxes..."
+                                    isInvalid={!!errors.noOfPits}
+                                    placeholder="No. of pits..."
                                 />
                             </div>
                         </div>

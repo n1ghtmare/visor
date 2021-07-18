@@ -1,4 +1,4 @@
-type Box = {
+type Pit = {
     id: string;
     eventId: number;
     name: string;
@@ -6,4 +6,4 @@ type Box = {
     description?: string;
 };
 
-export default Box;
+export default Pit;

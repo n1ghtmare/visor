@@ -1,21 +1,29 @@
-import { GetStaticPropsContext } from "next";
+import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useKarts } from "hooks/KartHooks";
 import { useEvent } from "hooks/EventHooks";
 
 import StatusType from "entities/StatusType";
+import Kart from "entities/Kart";
+
+import { groupedMapByStatusType } from "helpers/data";
 
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";
-import Button from "components/Shared/Button";
-import KartsTableBox from "components/KartsTableBox";
+import IconFlag from "components/Shared/IconFlag";
+import IconStop from "components/Shared/IconStop";
+import IconAdjustments from "components/Shared/IconAdjustments";
+import IconArrowSmLeft from "components/Shared/IconArrowSmLeft";
+import LinkAnchor from "components/Shared/LinkAnchor";
+import KartsTablePit from "components/KartsTablePit";
 import KartsTableIdle from "components/KartsTableIdle";
 import KartsTableRacing from "components/KartsTableRacing";
+import LinkPill from "components/EventDetails/LinkPill";
 
-export async function getServerSideProps(context: GetStaticPropsContext) {
-    const { id } = context.params;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const { id, status } = context.query;
     const eventId = parseInt(id as string, 10);
 
     // TODO: Should we validate the id and throw an error if it's not a number?
@@ -24,12 +32,29 @@ export async function getServerSideProps(context: GetStaticPropsContext) {
     }
 
     return {
-        props: { id: eventId }
+        props: { id: eventId, status: status || null }
     };
 }
 
-export default function EventDetails({ id }: { id: number }) {
+function parseStatus(status: string): StatusType {
+    switch (status) {
+        case "racing":
+            return StatusType.Racing;
+        case "idle":
+            return StatusType.Idle;
+        case "pit":
+            return StatusType.Pit;
+        default:
+            return null;
+    }
+}
+
+export default function EventDetails({ id, status }: { id: number; status?: string }) {
     const [statusType, setStatusType] = useState<StatusType>(StatusType.Racing);
+
+    useEffect(() => {
+        setStatusType(parseStatus(status) || StatusType.Racing);
+    }, [status]);
 
     const {
         karts,
@@ -57,11 +82,10 @@ export default function EventDetails({ id }: { id: number }) {
         return <LoadingIndicator />;
     }
 
-    const filteredKarts = karts.filter((x) => x.statusType === statusType);
-
-    console.log({ karts }, { filteredKarts });
+    const grouped: Map<StatusType, Kart[]> = groupedMapByStatusType(karts);
 
     function renderKartsTable() {
+        const filteredKarts = grouped.get(statusType);
         switch (statusType) {
             case StatusType.Idle:
                 return <KartsTableIdle karts={filteredKarts} />;
@@ -69,27 +93,54 @@ export default function EventDetails({ id }: { id: number }) {
             case StatusType.Racing:
                 return <KartsTableRacing karts={filteredKarts} />;
 
-            case StatusType.Box:
-                return <KartsTableBox karts={filteredKarts} />;
+            case StatusType.Pit:
+                return <KartsTablePit karts={filteredKarts} />;
         }
     }
 
     return (
         <>
             <Head>
-                <title>Visor - Event </title>
+                <title>Visor - Event / {event.name}</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main role="main">
-                <h1 className="text-4xl font-bold tracking-tight">{event.name}</h1>
-                <div className="mt-12">
-                    <div>
-                        <Button onClick={() => setStatusType(StatusType.Racing)}>Racing</Button>
-                        <Button onClick={() => setStatusType(StatusType.Idle)}>Idle</Button>
-                        <Button onClick={() => setStatusType(StatusType.Box)}>In Box</Button>
-                    </div>
-                    {renderKartsTable()}
+                <div className="flex items-end">
+                    <h1 className="flex-1 text-4xl font-bold tracking-tight">{event.name}</h1>
+                    <LinkAnchor href="/events">
+                        <IconArrowSmLeft />
+                        <span>back to all events</span>
+                    </LinkAnchor>
                 </div>
+                <div className="mt-12">
+                    <div className="flex space-x-3">
+                        <LinkPill
+                            isSelected={statusType === StatusType.Racing}
+                            href={`/events/${id}?status=racing`}
+                        >
+                            <IconFlag />
+                            <span>Racing</span>
+                            <span>({grouped.get(StatusType.Racing).length})</span>
+                        </LinkPill>
+                        <LinkPill
+                            isSelected={statusType === StatusType.Pit}
+                            href={`/events/${id}?status=pit`}
+                        >
+                            <IconAdjustments />
+                            <span>In Pit</span>
+                            <span>({grouped.get(StatusType.Pit).length})</span>
+                        </LinkPill>
+                        <LinkPill
+                            isSelected={statusType === StatusType.Idle}
+                            href={`/events/${id}?status=idle`}
+                        >
+                            <IconStop />
+                            <span>Idle</span>
+                            <span>({grouped.get(StatusType.Idle).length})</span>
+                        </LinkPill>
+                    </div>
+                </div>
+                <div className="mt-4">{renderKartsTable()}</div>
                 {(isValidatingKarts || isValidatingEvent) && <RefetchingIndicator />}
             </main>
         </>

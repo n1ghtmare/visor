@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { createEvent, createBoxes, createKarts } from "database/repository";
+import { createEvent, createPits, createKarts } from "database/repository";
 
 import Event from "entities/Event";
-import Box from "entities/Box";
+import Pit from "entities/Pit";
 import Kart from "entities/Kart";
 import PostEventResponseData from "entities/PostEventResponseData";
 
@@ -18,20 +18,20 @@ type PostRequestData = {
     name: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
-    noOfBoxes: number;
+    noOfPits: number;
 };
 
 // Routes Design for the API:
 // api/events POST
 // api/events/composite/index GET
 // api/events/[id]/karts/composite GET
-// api/events/[id]/boxes GET
+// api/events/[id]/pits GET
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const requestData = req.body as PostRequestData;
 
     const event: Event = await createEvent(requestData.name, MOCK_USER_ID);
-    const boxes: Box[] = await createBoxes(event.id, requestData.noOfBoxes);
+    const pits: Pit[] = await createPits(event.id, requestData.noOfPits);
     const karts: Kart[] = await createKarts(
         event.id,
         requestData.noOfTotalKarts,
@@ -40,7 +40,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const responseData: PostEventResponseData = {
         event,
-        boxes,
+        pits,
         karts
     };
 

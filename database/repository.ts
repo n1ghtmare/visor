@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import openConnection from "./connection";
 
 import Event from "entities/Event";
-import Box from "entities/Box";
+import Pit from "entities/Pit";
 import ClassificationType from "entities/ClassificationType";
 import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
@@ -15,39 +15,39 @@ const NO_OF_POSSIBLE_COLORS = 256 ** 3;
 const getRandomColorHex = (): string =>
     `#${Math.floor(Math.random() * NO_OF_POSSIBLE_COLORS).toString(16)}`;
 
-export async function createBoxes(eventId: number, noOfBoxes: number): Promise<Box[]> {
-    const boxes: Box[] = [];
+export async function createPits(eventId: number, noOfPits: number): Promise<Pit[]> {
+    const pits: Pit[] = [];
 
     const db = await openConnection();
 
     const stmt = await db.prepare(
-        "INSERT INTO boxes VALUES ($id, $eventId, $name, $colorHex, $description)"
+        "INSERT INTO pits VALUES ($id, $eventId, $name, $colorHex, $description)"
     );
 
-    for (let i = 0; i < noOfBoxes; i++) {
-        const box: Box = {
+    for (let i = 0; i < noOfPits; i++) {
+        const pit: Pit = {
             id: uuidv4(),
             eventId,
-            name: `Box ${i + 1}`,
+            name: `Pit ${i + 1}`,
             colorHex: getRandomColorHex(),
             description: null
         };
 
         await stmt.run({
-            $id: box.id,
-            $eventId: box.eventId,
-            $name: box.name,
-            $colorHex: box.colorHex,
+            $id: pit.id,
+            $eventId: pit.eventId,
+            $name: pit.name,
+            $colorHex: pit.colorHex,
             $description: null
         });
 
-        boxes.push(box);
+        pits.push(pit);
     }
 
     await stmt.finalize();
     await db.close();
 
-    return boxes;
+    return pits;
 }
 
 export async function createKarts(
@@ -67,7 +67,7 @@ export async function createKarts(
             $eventNo,
             $previousEventNo,
             $classificationType,
-            $boxId,
+            $pitId,
             $markdownNotes
         )`
     );
@@ -92,7 +92,7 @@ export async function createKarts(
             $eventNo: kart.eventNo,
             $previousEventNo: kart.previousEventNo,
             $classificationType: kart.classificationType,
-            $boxId: kart.boxId,
+            $pitId: kart.pitId,
             $markdownNotes: kart.markdownNotes
         });
 
@@ -133,7 +133,7 @@ export async function deleteEvent(id: number): Promise<void> {
 
     // TODO: Add a DB contstraint that would do cascade on delete
     await db.run("DELETE FROM karts WHERE event_id = ?", [id]);
-    await db.run("DELETE FROM boxes WHERE event_id = ?", [id]);
+    await db.run("DELETE FROM pits WHERE event_id = ?", [id]);
     await db.run("DELETE FROM events WHERE id = ?", [id]);
 
     await db.close();
@@ -167,9 +167,9 @@ export async function getEventComposites(userId: number): Promise<EventComposite
             e.name,
             (SELECT COUNT(id) FROM karts WHERE event_id = e.id) AS noOfKartsTotal,
             (SELECT COUNT(id) FROM karts WHERE status_type_id = 2 AND event_id = e.id) AS noOfKartsInRace,
-            (SELECT COUNT(id) FROM karts WHERE status_type_id = 3 AND event_id = e.id) AS noOfKartsInBox,
+            (SELECT COUNT(id) FROM karts WHERE status_type_id = 3 AND event_id = e.id) AS noOfKartsInPit,
             (SELECT COUNT(id) FROM karts WHERE status_type_id = 1 AND event_id = e.id) AS noOfKartsIdle,
-            (SELECT COUNT(id) FROM boxes WHERE event_id = e.id) AS noOfBoxes,
+            (SELECT COUNT(id) FROM pits WHERE event_id = e.id) AS noOfPits,
             created_by_user_id AS createdByUserId,
             created_on_date AS createdOnDate
         FROM events AS e
@@ -193,7 +193,7 @@ export async function getKartsByEventId(eventId: number): Promise<Kart[]> {
             event_no AS eventNo,
             previous_event_no AS previousEventNo,
             classification_type_id AS classificationType,
-            box_id AS boxId,
+            pit_id AS pitId,
             markdown_notes AS markdownNotes
         FROM karts
         WHERE event_id = ?`,

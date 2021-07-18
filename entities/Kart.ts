@@ -8,7 +8,7 @@ type Kart = {
     eventNo?: number;
     previousEventNo?: number;
     classificationType: ClassificationType;
-    boxId?: string;
+    pitId?: string;
     markdownNotes?: string;
 };
 

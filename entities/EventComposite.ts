@@ -3,9 +3,9 @@ type EventComposite = {
     name: string;
     noOfKartsTotal: number;
     noOfKartsInRace: number;
-    noOfKartsInBox: number;
+    noOfKartsInPit: number;
     noOfKartsIdle: number;
-    noOfBoxes: number;
+    noOfPits: number;
     createdByUserId: number;
     createdOnDate: Date;
 };
