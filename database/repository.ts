@@ -204,3 +204,23 @@ export async function getKartsByEventId(eventId: number): Promise<Kart[]> {
 
     return result as Kart[];
 }
+
+export async function getPitsByEventId(eventId: number): Promise<Pit[]> {
+    const db = await openConnection();
+
+    const result = await db.all(
+        `SELECT
+            id,
+            event_id AS eventId,
+            name,
+            color_hex AS colorHex,
+            description
+        FROM pits
+        WHERE event_id = ?`,
+        [eventId]
+    );
+
+    await db.close();
+
+    return result as Pit[];
+}

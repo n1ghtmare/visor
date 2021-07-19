@@ -1,6 +1,6 @@
 import ClassificationType from "entities/ClassificationType";
 import Kart from "entities/Kart";
-import IconCog from "./Shared/IconCog";
+import IconPencilAlt from "./Shared/IconPencilAlt";
 
 import KartsTable from "./Shared/KartsTable";
 import KartsTableBody from "./Shared/KartsTableBody";
@@ -26,7 +26,7 @@ function KartsTableRowIdle({ kart }: { kart: Kart }) {
                     className="text-blue-600 hover:text-blue-900"
                     onClick={() => console.log("Will edit here")}
                 >
-                    <IconCog />
+                    <IconPencilAlt />
                 </button>
             </td>
         </tr>

@@ -7,7 +7,7 @@ export default function LoadingIndicator() {
                 <div>
                     <Spinner />
                 </div>
-                <div className="">Loading data, please wait...</div>
+                <div>Loading data, please wait...</div>
             </div>
         </div>
     );

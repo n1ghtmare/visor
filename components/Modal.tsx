@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-const Modal = forwardRef<HTMLDivElement, React.PropsWithChildren<{ title: string }>>(
+const Modal = forwardRef<HTMLDivElement, React.PropsWithChildren<{ title?: string }>>(
     (props, ref) => {
         const [isInitialized, setIsInitialized] = useState(false);
 

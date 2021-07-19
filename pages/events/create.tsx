@@ -101,10 +101,7 @@ export default function Setup() {
                         <div className="px-6 py-3">
                             <div className="mt-4">
                                 <div className="flex items-baseline">
-                                    <label
-                                        className="flex-1 mb-2 font-bold text-gray-700"
-                                        htmlFor="name"
-                                    >
+                                    <label className="flex-1 mb-2 font-bold" htmlFor="name">
                                         What&apos;s the name of the event?
                                     </label>
 
@@ -129,7 +126,7 @@ export default function Setup() {
                             <div className="mt-4">
                                 <div className="flex items-baseline">
                                     <label
-                                        className="flex-1 mb-2 font-bold text-gray-700"
+                                        className="flex-1 mb-2 font-bold"
                                         htmlFor="noOfTotalKarts"
                                     >
                                         How many karts in total?
@@ -161,7 +158,7 @@ export default function Setup() {
                             <div className="mt-4">
                                 <div className="flex items-baseline">
                                     <label
-                                        className="flex-1 mb-2 font-bold text-gray-700"
+                                        className="flex-1 mb-2 font-bold"
                                         htmlFor="noOfStartingKarts"
                                     >
                                         How many karts are starting?
@@ -197,11 +194,8 @@ export default function Setup() {
 
                             <div className="mt-4">
                                 <div className="flex items-baseline">
-                                    <label
-                                        className="flex-1 mb-2 font-bold text-gray-700"
-                                        htmlFor="noOfPits"
-                                    >
-                                        How many pits?
+                                    <label className="flex-1 mb-2 font-bold" htmlFor="noOfPits">
+                                        How many pit lanes?
                                     </label>
 
                                     {errors.noOfPits && (
