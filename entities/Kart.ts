@@ -10,6 +10,9 @@ type Kart = {
     classificationType: ClassificationType;
     pitId?: string;
     markdownNotes?: string;
+    // Aux read-only columns (returned from a join)
+    pitName?: string;
+    pitColorHex?: string;
 };
 
 export default Kart;

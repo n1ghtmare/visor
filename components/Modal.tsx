@@ -22,13 +22,13 @@ const Modal = forwardRef<HTMLDivElement, React.PropsWithChildren<{ title?: strin
         return (
             isInitialized &&
             createPortal(
-                <div className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center animate-fade-in">
+                <div className="fixed inset-x-0 bottom-0 z-10 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center animate-fade-in">
                     <div className="fixed inset-0">
                         <div className="absolute inset-0 bg-gray-700 opacity-75"></div>
                     </div>
 
                     <div
-                        className="overflow-hidden text-gray-900 bg-white rounded shadow-md transform dark:bg-gray-800 sm:max-w-lg sm:w-full dark:text-gray-200"
+                        className="z-50 overflow-hidden text-gray-900 bg-white rounded shadow-md dark:bg-gray-800 sm:max-w-lg sm:w-full dark:text-gray-200"
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="modal-title"

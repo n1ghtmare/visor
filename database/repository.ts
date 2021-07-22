@@ -139,7 +139,7 @@ export async function deleteEvent(id: number): Promise<void> {
     await db.close();
 }
 
-export async function getEventById(id: number): Promise<Event> {
+export async function getEvent(id: number): Promise<Event> {
     const db = await openConnection();
 
     const result = await db.get(
@@ -158,7 +158,7 @@ export async function getEventById(id: number): Promise<Event> {
     return result as Event;
 }
 
-export async function getEventComposites(userId: number): Promise<EventComposite[]> {
+export async function getEventCompositesByUserId(userId: number): Promise<EventComposite[]> {
     const db = await openConnection();
 
     const result = await db.all(
@@ -187,22 +187,77 @@ export async function getKartsByEventId(eventId: number): Promise<Kart[]> {
 
     const result = await db.all(
         `SELECT
-            id,
-            event_id AS eventId,
-            status_type_id AS statusType,
-            event_no AS eventNo,
-            previous_event_no AS previousEventNo,
-            classification_type_id AS classificationType,
-            pit_id AS pitId,
-            markdown_notes AS markdownNotes
-        FROM karts
-        WHERE event_id = ?`,
+            k.id,
+            k.event_id AS eventId,
+            k.status_type_id AS statusType,
+            k.event_no AS eventNo,
+            k.previous_event_no AS previousEventNo,
+            k.classification_type_id AS classificationType,
+            k.pit_id AS pitId,
+            k.markdown_notes AS markdownNotes,
+            p.name AS pitName,
+            p.color_hex AS pitColorHex
+        FROM karts AS k
+        LEFT OUTER JOIN pits AS p ON k.pit_id = p.id
+        WHERE k.event_id = ?`,
         [eventId]
     );
 
     await db.close();
 
     return result as Kart[];
+}
+
+export async function getKart(id: string): Promise<Kart> {
+    const db = await openConnection();
+
+    const result = await db.get(
+        `SELECT
+            k.id,
+            k.event_id AS eventId,
+            k.status_type_id AS statusType,
+            k.event_no AS eventNo,
+            k.previous_event_no AS previousEventNo,
+            k.classification_type_id AS classificationType,
+            k.pit_id AS pitId,
+            k.markdown_notes AS markdownNotes,
+            p.name AS pitName,
+            p.color_hex AS pitColorHex
+        FROM karts AS k
+        LEFT OUTER JOIN pits AS p ON k.pit_id = p.id
+        WHERE k.id = ?`,
+        [id]
+    );
+
+    await db.close();
+
+    return result as Kart;
+}
+
+export async function updateKart(kart: Kart): Promise<void> {
+    const db = await openConnection();
+
+    await db.run(
+        `UPDATE karts SET
+            status_type_id = ?,
+            event_no = ?,
+            previous_event_no = ?,
+            classification_type_id = ?,
+            pit_id = ?,
+            markdown_notes = ?
+        WHERE id = ?`,
+        [
+            kart.statusType,
+            kart.eventNo,
+            kart.previousEventNo,
+            kart.classificationType,
+            kart.pitId,
+            kart.markdownNotes,
+            kart.id
+        ]
+    );
+
+    await db.close();
 }
 
 export async function getPitsByEventId(eventId: number): Promise<Pit[]> {

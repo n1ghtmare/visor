@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 import { usePits } from "hooks/PitHooks";
+
 import Kart from "entities/Kart";
+import StatusType from "entities/StatusType";
+import ClassificationType from "entities/ClassificationType";
 
 import Modal from "./Modal";
 import Button from "./Shared/Button";
@@ -12,39 +15,15 @@ import IconPlay from "./Shared/IconPlay";
 import KartsTable from "./Shared/KartsTable";
 import KartsTableBody from "./Shared/KartsTableBody";
 import KartsTableEmptyRow from "./Shared/KartsTableEmptyRow";
-import Spinner from "./Shared/Spinner";
 import IconSwitchHorizontal from "./Shared/IconSwitchHorizontal";
 import IconPencilAlt from "./Shared/IconPencilAlt";
-import ClassificationType from "entities/ClassificationType";
 import Radio from "./Shared/Radio";
 import TextArea from "./Shared/TextArea";
 import IconStop from "./Shared/IconStop";
-import StatusType from "entities/StatusType";
-
-function PreviousEventNo({ value }: { value: number }) {
-    return (
-        <div className="inline-flex px-3 py-2 font-bold leading-none text-gray-500 bg-white border border-gray-300 rounded shadow-sm">
-            {value}
-        </div>
-    );
-}
-
-function EventNo({ value }: { value: number }) {
-    return (
-        <div className="inline-flex px-3 py-2 font-bold leading-none bg-white border border-gray-400 rounded shadow-sm">
-            {value}
-        </div>
-    );
-}
-
-function LoadingIndicatorFlat() {
-    return (
-        <div className="flex flex-col items-center py-6 space-y-4">
-            <div>Loading data, please wait...</div>
-            <Spinner />
-        </div>
-    );
-}
+import LoadingIndicatorFlat from "./Shared/LoadingIndicatorFlat";
+import EventNoBadge from "./Shared/EventNoBadge";
+import PreviousEventNoBadge from "./Shared/PreviousEventNoBadge";
+import ClassificationBadge from "./Shared/ClassificationBadge";
 
 function EditModalRacing({
     kart,
@@ -92,8 +71,8 @@ function EditModalRacing({
                     </p>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="mt-6 space-y-4">
+                <div className="mt-6 space-y-6">
+                    <div className="space-y-4">
                         <div className="flex px-4 py-2 border rounded">
                             <Radio
                                 value={ClassificationType.SlowAF.toString()}
@@ -146,15 +125,6 @@ function EditModalRacing({
                         </div>
                     </div>
 
-                    {/* TODO: Move this to "In Pit" and "Idle" you shouldn't be able to assign a race no while in game? (also it should be in the other modal, when changing statuses)
-                    <div className="space-y-2">
-                        <label className="font-bold" htmlFor="raceNo">
-                            Race No.
-                        </label>
-                        <Input id="raceNo" type="text" placeholder="Unique Race No..." />
-                    </div>
-                      */}
-
                     <div className="space-y-2">
                         <label className="font-bold" htmlFor="markdownNotes">
                             Notes
@@ -168,6 +138,7 @@ function EditModalRacing({
                         />
                     </div>
                 </div>
+
                 <div className="mt-6 sm:flex sm:flex-row-reverse sm:space-x-2 sm:space-x-reverse">
                     <span className="flex w-full sm:w-auto">
                         <Button type="submit">
@@ -196,7 +167,8 @@ function MoveModalRacing({
     onCancel: () => void;
     onSubmit: (kart: Kart) => void;
 }) {
-    const [status, setStatus] = useState<string>("");
+    const [statusType, setStatusType] = useState<StatusType>(null);
+    const [pitId, setPitId] = useState<string>(null);
     const [isValidationError, setIsValidationError] = useState<boolean>(false);
 
     const modalRef = useRef<HTMLDivElement>(null);
@@ -208,22 +180,24 @@ function MoveModalRacing({
 
     useEffect(() => {
         setIsValidationError(false);
-    }, [status]);
+    }, [statusType]);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        if (!status) {
+        if (!statusType) {
             setIsValidationError(true);
 
             return;
         }
 
-        if (status.indexOf("pit|") === 0) {
+        if (statusType === StatusType.Pit) {
             onSubmit({
                 ...kart,
-                statusType: StatusType.Pit,
-                pitId: status.split("|")[1]
+                statusType,
+                pitId,
+                previousEventNo: kart.eventNo,
+                eventNo: null
             });
 
             return;
@@ -232,7 +206,9 @@ function MoveModalRacing({
         onSubmit({
             ...kart,
             statusType: StatusType.Idle,
-            pitId: null
+            pitId: null,
+            previousEventNo: kart.eventNo,
+            eventNo: null
         });
     }
 
@@ -240,8 +216,25 @@ function MoveModalRacing({
         onCancel();
     }
 
+    function parseStatus(value: string): StatusType {
+        if (!value) {
+            return null;
+        }
+
+        if (value.indexOf("pit|") === 0) {
+            return StatusType.Pit;
+        }
+
+        return StatusType.Idle;
+    }
+
     function handleStatusChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setStatus(e.target.value);
+        const newStatusType: StatusType = parseStatus(e.target.value);
+        const newPitId: string =
+            newStatusType === StatusType.Pit ? e.target.value.split("|")[1] : null;
+
+        setStatusType(newStatusType);
+        setPitId(newPitId);
     }
 
     if (isError) {
@@ -345,7 +338,7 @@ function KartsTableRowRacing({
     }
 
     function handleSubmit(kart: Kart) {
-        console.log("Will submit the kart for edit", { kart });
+        onEditConfirm(kart);
         setIsMoving(false);
         setIsEditing(false);
     }
@@ -354,6 +347,7 @@ function KartsTableRowRacing({
         <>
             {isMoving && (
                 <MoveModalRacing
+                    key="move-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
@@ -362,37 +356,39 @@ function KartsTableRowRacing({
 
             {isEditing && (
                 <EditModalRacing
+                    key="edit-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
                 />
             )}
+
             <tr className="hover:bg-blue-50 hover:cursor-pointer">
                 <td className="px-6 py-3 font-medium text-left">{kart.id}</td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <EventNo value={kart.eventNo} />
+                    <EventNoBadge value={kart.eventNo} />
                 </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
-                    {kart.previousEventNo ? <PreviousEventNo value={kart.previousEventNo} /> : "-"}
+                    <PreviousEventNoBadge value={kart.previousEventNo} />
                 </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
-                    {kart.classificationType}
+                    <ClassificationBadge value={kart.classificationType} />
                 </td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">
+                <td className="px-6 py-4 text-left whitespace-nowrap">
                     {kart.markdownNotes || "-"}
                 </td>
-                <td className="px-6 py-4 font-medium text-right whitespace-nowrap">
+                <td className="font-medium text-center whitespace-nowrap">
                     <button
-                        className="text-blue-600 hover:text-blue-900"
+                        className="p-5 text-blue-600 hover:text-blue-900"
                         title="Edit"
                         onClick={handleEditClick}
                     >
                         <IconPencilAlt />
                     </button>
                 </td>
-                <td className="px-6 py-4 font-medium text-right whitespace-nowrap">
+                <td className="font-medium text-center whitespace-nowrap">
                     <button
-                        className="text-blue-600 hover:text-blue-900"
+                        className="p-5 text-blue-600 hover:text-blue-900"
                         title="Move"
                         onClick={handleMoveClick}
                     >
@@ -408,25 +404,25 @@ function KartsTableHeaderRacing() {
     return (
         <thead className="bg-gray-50">
             <tr>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap">
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-96 whitespace-nowrap">
                     Id
                 </th>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase w-28 whitespace-nowrap">
                     Event No
                 </th>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase w-44 whitespace-nowrap">
                     Previous Event No
                 </th>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
+                <th className="w-40 px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
                     Classification
                 </th>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap">
                     Notes
                 </th>
-                <th className="relative px-6 py-4">
+                <th className="w-20">
                     <span className="sr-only">Edit</span>
                 </th>
-                <th className="relative px-6 py-4">
+                <th className="w-20">
                     <span className="sr-only">Change Status</span>
                 </th>
             </tr>
@@ -453,7 +449,9 @@ export default function KartsTableRacing({
                         }
                     />
                 ) : (
-                    karts.map((x) => <KartsTableRowRacing key={x.id} kart={x} />)
+                    karts.map((x) => (
+                        <KartsTableRowRacing key={x.id} kart={x} onEditConfirm={onEditConfirm} />
+                    ))
                 )}
             </KartsTableBody>
         </KartsTable>

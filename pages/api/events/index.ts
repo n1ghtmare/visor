@@ -50,7 +50,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // POST: api/events
     if (req.method === "POST") {
-        console.log("WILL NOW POST EH");
         await handlePost(req, res);
     } else {
         res.status(405).json({ message: "Method not allowed" });

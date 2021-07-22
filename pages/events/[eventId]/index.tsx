@@ -21,18 +21,19 @@ import KartsTablePit from "components/KartsTablePit";
 import KartsTableIdle from "components/KartsTableIdle";
 import KartsTableRacing from "components/KartsTableRacing";
 import LinkPill from "components/EventDetails/LinkPill";
+import { mutate } from "swr";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const { id, status } = context.query;
-    const eventId = parseInt(id as string, 10);
+    const { eventId, status } = context.query;
+    const id = parseInt(eventId as string, 10);
 
     // TODO: Should we validate the id and throw an error if it's not a number?
-    if (isNaN(eventId)) {
+    if (isNaN(id)) {
         throw Error("Invalid id");
     }
 
     return {
-        props: { id: eventId, status: status || null }
+        props: { id, status: status || null }
     };
 }
 
@@ -47,6 +48,22 @@ function parseStatus(status: string): StatusType {
         default:
             return null;
     }
+}
+
+async function updateKart(kart: Kart): Promise<void> {
+    const response = await fetch(`/api/events/${kart.eventId}/karts/${kart.id}`, {
+        method: "PUT",
+        body: JSON.stringify(kart),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(response.status.toString());
+    }
+
+    await response.json();
 }
 
 export default function EventDetails({ id, status }: { id: number; status?: string }) {
@@ -82,19 +99,37 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         return <LoadingIndicator />;
     }
 
+    async function handleEditConfirm(kart: Kart) {
+        const kartsApiUrl = `/api/events/${id}/karts`;
+
+        mutate(
+            kartsApiUrl,
+            karts.map((x) => (x.id === kart.id ? kart : x)),
+            false
+        );
+
+        // TODO: Add an mutation for the new kart
+
+        await updateKart(kart);
+
+        // TODO: Mutate all karts from server (sync)
+        mutate(kartsApiUrl);
+    }
+
     const grouped: Map<StatusType, Kart[]> = groupedMapByStatusType(karts);
 
     function renderKartsTable() {
         const filteredKarts = grouped.get(statusType);
-        switch (statusType) {
-            case StatusType.Idle:
-                return <KartsTableIdle karts={filteredKarts} />;
 
+        switch (statusType) {
             case StatusType.Racing:
-                return <KartsTableRacing karts={filteredKarts} />;
+                return <KartsTableRacing karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
 
             case StatusType.Pit:
-                return <KartsTablePit karts={filteredKarts} />;
+                return <KartsTablePit karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
+
+            case StatusType.Idle:
+                return <KartsTableIdle karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
         }
     }
 

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { getEventById } from "database/repository";
+import { getEvent } from "database/repository";
 
 import Event from "entities/Event";
 
@@ -11,13 +11,15 @@ export async function validateRequestAndGetEvent(
     req: NextApiRequest,
     res: NextApiResponse
 ): Promise<Event> {
-    const eventId = parseInt(req.query.id as string, 10);
+    console.log({ query: req.query });
+    const eventId: number = parseInt(req.query.eventId as string, 10);
+    console.log({ eventId });
 
     if (isNaN(eventId)) {
         res.status(400).json({ message: "Bad Request" });
     }
 
-    const event: Event = await getEventById(eventId);
+    const event: Event = await getEvent(eventId);
 
     // Ensure that the event is owned by the current user if in future we have more than one user
     if (event.createdByUserId !== MOCK_USER_ID) {
