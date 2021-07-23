@@ -169,15 +169,20 @@ function EditModalIdle({
 function MoveModalIdle({
     kart,
     onCancel,
-    onSubmit
+    onSubmit,
+    eventNosInUse
 }: {
     kart: Kart;
     onCancel: () => void;
     onSubmit: (kart: Kart) => void;
+    eventNosInUse: number[];
 }) {
+    // TODO: Refactor this into a reducer (too much state here)
     const [statusType, setStatusType] = useState<StatusType>(null);
     const [pitId, setPitId] = useState<string>(null);
-    const [isValidationError, setIsValidationError] = useState<boolean>(false);
+    const [validationErrorForStatus, setValidationErrorForStatus] = useState<string>(null);
+    const [validationErrorForEventNo, setValidationErrorForEventNo] = useState<string>(null);
+    const [eventNo, setEventNo] = useState<string>("");
 
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -186,16 +191,16 @@ function MoveModalIdle({
     useEscCancel(onCancel);
     useOutsideRefsClick([modalRef], onCancel);
 
-    useEffect(() => {
-        setIsValidationError(false);
-    }, [statusType]);
-
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         if (!statusType) {
-            setIsValidationError(true);
+            setValidationErrorForStatus("Invalid status type.");
+            return;
+        }
 
+        if (statusType === StatusType.Racing && eventNo.length === 0) {
+            setValidationErrorForEventNo("Event No is required");
             return;
         }
 
@@ -206,11 +211,31 @@ function MoveModalIdle({
         }
 
         // Decide on new kart no?
-        onSubmit({ ...kart, statusType: StatusType.Racing, pitId: null });
+        onSubmit({
+            ...kart,
+            statusType: StatusType.Racing,
+            eventNo: parseInt(eventNo, 10),
+            pitId: null
+        });
     }
 
     function handleCancelClick() {
         onCancel();
+    }
+
+    function handleEventNoChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setValidationErrorForEventNo(null);
+        const newEventNo = parseInt(e.target.value, 10);
+
+        if (isNaN(newEventNo)) {
+            setValidationErrorForEventNo("Has to be a number.");
+        }
+
+        if (eventNosInUse.includes(newEventNo)) {
+            setValidationErrorForEventNo(`${newEventNo} is already in use.`);
+        }
+
+        setEventNo(e.target.value);
     }
 
     function parseStatus(value: string): StatusType {
@@ -232,6 +257,11 @@ function MoveModalIdle({
 
         setStatusType(newStatusType);
         setPitId(newPitId);
+
+        // Reset the validation errors and event no
+        setValidationErrorForStatus(null);
+        setValidationErrorForEventNo(null);
+        setEventNo("");
     }
 
     if (isError) {
@@ -259,11 +289,10 @@ function MoveModalIdle({
                     </p>
                 </div>
                 <div className="mt-6 space-y-6">
-                    {isValidationError && (
-                        <div className="text-red-500">
-                            * You need to select a valid status in order to continue.
-                        </div>
+                    {validationErrorForStatus && (
+                        <div className="text-red-500">* {validationErrorForStatus}</div>
                     )}
+
                     <div className="space-y-4">
                         {pits.map((x) => (
                             <div key={x.id} className="flex px-4 py-2 border rounded">
@@ -294,10 +323,25 @@ function MoveModalIdle({
 
                     {statusType === StatusType.Racing && (
                         <div className="space-y-2">
-                            <label className="font-bold" htmlFor="raceNo">
-                                Race No.
-                            </label>
-                            <Input id="raceNo" type="text" placeholder="Unique Race No..." />
+                            <div className="flex items-baseline">
+                                <label className="flex-1 font-bold" htmlFor="eventNo">
+                                    Event No.
+                                </label>
+
+                                {validationErrorForEventNo && (
+                                    <span className="text-sm text-red-500">
+                                        {validationErrorForEventNo}
+                                    </span>
+                                )}
+                            </div>
+                            <Input
+                                id="eventNo"
+                                type="text"
+                                placeholder="Unique Event No..."
+                                value={eventNo}
+                                isInvalid={!!validationErrorForEventNo}
+                                onChange={handleEventNoChange}
+                            />
                         </div>
                     )}
                 </div>
@@ -322,9 +366,11 @@ function MoveModalIdle({
 
 function KartsTableRowIdle({
     kart,
+    eventNosInUse,
     onEditConfirm
 }: {
     kart: Kart;
+    eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
 }) {
     const [isMoving, setIsMoving] = useState<boolean>(false);
@@ -355,16 +401,15 @@ function KartsTableRowIdle({
         <>
             {isMoving && (
                 <MoveModalIdle
-                    key="move-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
+                    eventNosInUse={eventNosInUse}
                 />
             )}
 
             {isEditing && (
                 <EditModalIdle
-                    key="edit-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
@@ -434,9 +479,11 @@ function KartsTableHeaderIdle() {
 
 export default function KartsTableIdle({
     karts,
+    eventNosInUse,
     onEditConfirm
 }: {
     karts: Kart[];
+    eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
 }) {
     return (
@@ -452,7 +499,12 @@ export default function KartsTableIdle({
                     />
                 ) : (
                     karts.map((x) => (
-                        <KartsTableRowIdle key={x.id} kart={x} onEditConfirm={onEditConfirm} />
+                        <KartsTableRowIdle
+                            key={x.id}
+                            kart={x}
+                            eventNosInUse={eventNosInUse}
+                            onEditConfirm={onEditConfirm}
+                        />
                     ))
                 )}
             </KartsTableBody>

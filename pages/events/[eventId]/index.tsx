@@ -121,16 +121,29 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
     function renderKartsTable() {
         const filteredKarts = grouped.get(statusType);
 
-        switch (statusType) {
-            case StatusType.Racing:
-                return <KartsTableRacing karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
-
-            case StatusType.Pit:
-                return <KartsTablePit karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
-
-            case StatusType.Idle:
-                return <KartsTableIdle karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
+        if (statusType === StatusType.Racing) {
+            return <KartsTableRacing karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
         }
+
+        const eventNosInUse = karts.filter((x) => x.eventNo !== null).map((x) => x.eventNo);
+
+        if (statusType === StatusType.Pit) {
+            return (
+                <KartsTablePit
+                    karts={filteredKarts}
+                    onEditConfirm={handleEditConfirm}
+                    eventNosInUse={eventNosInUse}
+                />
+            );
+        }
+
+        return (
+            <KartsTableIdle
+                karts={filteredKarts}
+                onEditConfirm={handleEditConfirm}
+                eventNosInUse={eventNosInUse}
+            />
+        );
     }
 
     return (

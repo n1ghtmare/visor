@@ -164,18 +164,24 @@ function EditModalPit({
         </Modal>
     );
 }
+
 function MoveModalPit({
     kart,
     onCancel,
-    onSubmit
+    onSubmit,
+    eventNosInUse
 }: {
     kart: Kart;
     onCancel: () => void;
     onSubmit: (kart: Kart) => void;
+    eventNosInUse: number[];
 }) {
+    // TODO: Refactor this into a reducer (too much state here)
     const [statusType, setStatusType] = useState<StatusType>(null);
     const [pitId, setPitId] = useState<string>(null);
-    const [isValidationError, setIsValidationError] = useState<boolean>(false);
+    const [validationErrorForStatus, setValidationErrorForStatus] = useState<string>(null);
+    const [validationErrorForEventNo, setValidationErrorForEventNo] = useState<string>(null);
+    const [eventNo, setEventNo] = useState<string>("");
 
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -184,32 +190,54 @@ function MoveModalPit({
     useEscCancel(onCancel);
     useOutsideRefsClick([modalRef], onCancel);
 
-    useEffect(() => {
-        setIsValidationError(false);
-    }, [statusType]);
-
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        if (!statusType) {
-            setIsValidationError(true);
+        if (validationErrorForStatus || validationErrorForEventNo) {
+            return;
+        }
 
+        if (!statusType) {
+            setValidationErrorForStatus("Invalid status type.");
+            return;
+        }
+
+        if (statusType === StatusType.Racing && eventNo.length === 0) {
+            setValidationErrorForEventNo("Event No is required");
             return;
         }
 
         if (statusType === StatusType.Pit) {
             // TODO: Do a check and don't do unessessary updates if the pit is the same as the current one?
             onSubmit({ ...kart, statusType, pitId });
-
             return;
         }
 
-        // Decide on new kart no (if kart is placed back in Race)?
-        onSubmit({ ...kart, statusType, pitId: null });
+        onSubmit({
+            ...kart,
+            statusType,
+            pitId: null,
+            eventNo: StatusType.Racing ? parseInt(eventNo, 10) : null
+        });
     }
 
     function handleCancelClick() {
         onCancel();
+    }
+
+    function handleEventNoChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setValidationErrorForEventNo(null);
+        const newEventNo = parseInt(e.target.value, 10);
+
+        if (isNaN(newEventNo)) {
+            setValidationErrorForEventNo("Has to be a number.");
+        }
+
+        if (eventNosInUse.includes(newEventNo)) {
+            setValidationErrorForEventNo(`${newEventNo} is already in use.`);
+        }
+
+        setEventNo(e.target.value);
     }
 
     function parseStatus(value: string): StatusType {
@@ -231,6 +259,11 @@ function MoveModalPit({
 
         setStatusType(newStatusType);
         setPitId(newPitId);
+
+        // Reset the validation errors and event no
+        setValidationErrorForStatus(null);
+        setValidationErrorForEventNo(null);
+        setEventNo("");
     }
 
     if (isError) {
@@ -258,30 +291,31 @@ function MoveModalPit({
                     </p>
                 </div>
                 <div className="mt-6 space-y-6">
-                    {isValidationError && (
-                        <div className="text-red-500">
-                            * You need to select a valid status in order to continue.
-                        </div>
+                    {validationErrorForStatus && (
+                        <div className="text-red-500">* {validationErrorForStatus}</div>
                     )}
+
                     <div className="space-y-4">
-                        {pits.map((x) => (
-                            <div key={x.id} className="flex px-4 py-2 border rounded">
-                                <Radio
-                                    name="status"
-                                    value={`pit|${x.id}`}
-                                    labelText={x.name}
-                                    onChange={handleStatusChange}
-                                />
-                                <div
-                                    style={{ backgroundColor: `${x.colorHex}` }}
-                                    className="w-6 min-h-full rounded"
-                                />
-                            </div>
-                        ))}
+                        {pits
+                            .filter((x) => x.id !== kart.pitId)
+                            .map((x) => (
+                                <div key={x.id} className="flex px-4 py-2 border rounded">
+                                    <Radio
+                                        name="status"
+                                        value={`pit|${x.id}`}
+                                        labelText={x.name}
+                                        onChange={handleStatusChange}
+                                    />
+                                    <div
+                                        style={{ backgroundColor: `${x.colorHex}` }}
+                                        className="w-6 min-h-full rounded"
+                                    />
+                                </div>
+                            ))}
                         <div className="flex px-4 py-2 border rounded">
                             <Radio
                                 name="status"
-                                value="idle"
+                                value={StatusType.Idle.toString()}
                                 labelText="Idle"
                                 onChange={handleStatusChange}
                             />
@@ -292,7 +326,7 @@ function MoveModalPit({
                         <div className="flex px-4 py-2 border rounded">
                             <Radio
                                 name="status"
-                                value="racing"
+                                value={StatusType.Racing.toString()}
                                 labelText="Racing"
                                 onChange={handleStatusChange}
                             />
@@ -304,10 +338,25 @@ function MoveModalPit({
 
                     {statusType === StatusType.Racing && (
                         <div className="space-y-2">
-                            <label className="font-bold" htmlFor="raceNo">
-                                Race No.
-                            </label>
-                            <Input id="raceNo" type="text" placeholder="Unique Race No..." />
+                            <div className="flex items-baseline">
+                                <label className="flex-1 font-bold" htmlFor="eventNo">
+                                    Event No.
+                                </label>
+
+                                {validationErrorForEventNo && (
+                                    <span className="text-sm text-red-500">
+                                        {validationErrorForEventNo}
+                                    </span>
+                                )}
+                            </div>
+                            <Input
+                                id="eventNo"
+                                type="text"
+                                placeholder="Unique Event No..."
+                                value={eventNo}
+                                isInvalid={!!validationErrorForEventNo}
+                                onChange={handleEventNoChange}
+                            />
                         </div>
                     )}
                 </div>
@@ -331,10 +380,12 @@ function MoveModalPit({
 }
 function KartsTableRowPit({
     kart,
-    onEditConfirm
+    onEditConfirm,
+    eventNosInUse
 }: {
     kart: Kart;
     onEditConfirm: (kart: Kart) => void;
+    eventNosInUse: number[];
 }) {
     const [isMoving, setIsMoving] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -364,16 +415,15 @@ function KartsTableRowPit({
         <>
             {isMoving && (
                 <MoveModalPit
-                    key="move-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
+                    eventNosInUse={eventNosInUse}
                 />
             )}
 
             {isEditing && (
                 <EditModalPit
-                    key="edit-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
@@ -448,9 +498,11 @@ function KartsTableHeaderPit() {
 
 export default function KartsTablePit({
     karts,
+    eventNosInUse,
     onEditConfirm
 }: {
     karts: Kart[];
+    eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
 }) {
     return (
@@ -469,6 +521,7 @@ export default function KartsTablePit({
                         <KartsTableRowPit
                             key={x.id}
                             kart={x}
+                            eventNosInUse={eventNosInUse}
                             onEditConfirm={(kart) => onEditConfirm(kart)}
                         />
                     ))
