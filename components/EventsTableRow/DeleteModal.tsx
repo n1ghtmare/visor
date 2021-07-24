@@ -1,12 +1,12 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
-import Modal from "components/Modal";
 import ButtonDanger from "components/Shared/ButtonDanger";
 import ButtonOutline from "components/Shared/ButtonOutline";
 import IconBan from "components/Shared/IconBan";
 import IconExclamationCircle from "components/Shared/IconExclamationCircle";
+import Modal from "components/Shared/Modal";
 
 export default function DeleteModal(props: {
     eventName: string;
