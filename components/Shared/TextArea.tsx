@@ -17,6 +17,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>((props, re
             ref={ref}
             id={props.id}
             name={props.name}
+            value={props.value}
             placeholder={props.placeholder}
             disabled={props.disabled}
             onChange={props.onChange}

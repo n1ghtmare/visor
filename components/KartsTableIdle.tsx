@@ -35,7 +35,7 @@ function EditModalIdle({
     onSubmit: (kart: Kart) => void;
 }) {
     // TODO: See what kind of validation rules these inputs need?
-    const [markdownNotes, setMarkdownNotes] = useState<string>("");
+    const [markdownNotes, setMarkdownNotes] = useState<string>(kart.markdownNotes || "");
     const [classificationType, setClassificationType] = useState<ClassificationType>(
         kart.classificationType
     );
@@ -125,15 +125,6 @@ function EditModalIdle({
                         </div>
                     </div>
 
-                    {/* TODO: Move this to "In Pit" and "Idle" you shouldn't be able to assign a race no while in game? (also it should be in the other modal, when changing statuses)
-                    <div className="space-y-2">
-                        <label className="font-bold" htmlFor="raceNo">
-                            Race No.
-                        </label>
-                        <Input id="raceNo" type="text" placeholder="Unique Race No..." />
-                    </div>
-                      */}
-
                     <div className="space-y-2">
                         <label className="font-bold" htmlFor="markdownNotes">
                             Notes
@@ -163,6 +154,71 @@ function EditModalIdle({
                 </div>
             </form>
         </Modal>
+    );
+}
+
+// if you provide [1, 2, 4, 5, 7, 8, 9, 11] you will get back [3, 6, 10]
+// takes into account padding, which means [3, 4, 5] will get you back [1, 2] (i.e. the missing values *before* the first value)
+function getSeriesGapsInSortedArray(sortedArr: number[]): number[] {
+    const gaps = [];
+
+    // add padding values
+    for (let i = 1; i < sortedArr[0]; i++) {
+        gaps.push(i);
+    }
+
+    for (let i = 0; i < sortedArr.length; i++) {
+        const gap = sortedArr[i + 1] - sortedArr[i];
+        if (gap > 1) {
+            for (let j = sortedArr[i] + 1; j < sortedArr[i + 1]; j++) {
+                gaps.push(j);
+            }
+        }
+    }
+    return gaps;
+}
+
+// if you provide [1, 2, 3, 7, 5, 8, 9, 10] you will get back [[1, 2, 3], [5], [7, 8, 9, 10]]
+function getSeriesInSortedArray(sortedArr: number[]): number[][] {
+    const series: number[][] = [];
+
+    for (let i = 0; i < sortedArr.length; i++) {
+        if (sortedArr[i + 1] - sortedArr[i] === 1) {
+            const s = [];
+
+            while (sortedArr[i + 1] - sortedArr[i] === 1) {
+                s.push(sortedArr[i]);
+                i++;
+            }
+
+            series.push(s.concat([s[s.length - 1] + 1]));
+        } else {
+            series.push([].concat(sortedArr[i]));
+        }
+    }
+    return series;
+}
+
+function AvailableEventNosNotice({ eventNosInUse }: { eventNosInUse: number[] }) {
+    function generateHumanizedNotice(): string {
+        const sortedArr: number[] = eventNosInUse.slice(0).sort((a, b) => a - b);
+        const gaps: number[] = getSeriesGapsInSortedArray(sortedArr);
+
+        console.log({ gaps }, { sortedArr });
+
+        const series: number[][] = getSeriesInSortedArray(gaps);
+        const humanized: string[] = series.map((x) =>
+            x.length > 2 ? `${x[0]}...${x[x.length - 1]}` : x.toString()
+        );
+
+        return `${humanized.join(", ")} or >${sortedArr[sortedArr.length - 1]}`;
+    }
+
+    return (
+        <div className="px-4 py-3 text-blue-600 border border-blue-500 rounded space-y-2 bg-blue-50">
+            <div>The currently available Event numbers are:</div>
+            <div className="font-bold">{generateHumanizedNotice()}</div>
+        </div>
     );
 }
 
@@ -322,27 +378,30 @@ function MoveModalIdle({
                     </div>
 
                     {statusType === StatusType.Racing && (
-                        <div className="space-y-2">
-                            <div className="flex items-baseline">
-                                <label className="flex-1 font-bold" htmlFor="eventNo">
-                                    Event No.
-                                </label>
+                        <>
+                            <AvailableEventNosNotice eventNosInUse={eventNosInUse} />
+                            <div className="space-y-2">
+                                <div className="flex items-baseline">
+                                    <label className="flex-1 font-bold" htmlFor="eventNo">
+                                        Event No.
+                                    </label>
 
-                                {validationErrorForEventNo && (
-                                    <span className="text-sm text-red-500">
-                                        {validationErrorForEventNo}
-                                    </span>
-                                )}
+                                    {validationErrorForEventNo && (
+                                        <span className="text-sm text-red-500">
+                                            {validationErrorForEventNo}
+                                        </span>
+                                    )}
+                                </div>
+                                <Input
+                                    id="eventNo"
+                                    type="text"
+                                    placeholder="Unique Event No..."
+                                    value={eventNo}
+                                    isInvalid={!!validationErrorForEventNo}
+                                    onChange={handleEventNoChange}
+                                />
                             </div>
-                            <Input
-                                id="eventNo"
-                                type="text"
-                                placeholder="Unique Event No..."
-                                value={eventNo}
-                                isInvalid={!!validationErrorForEventNo}
-                                onChange={handleEventNoChange}
-                            />
-                        </div>
+                        </>
                     )}
                 </div>
                 <div className="mt-6 sm:flex sm:flex-row-reverse sm:space-x-2 sm:space-x-reverse">
@@ -424,9 +483,7 @@ function KartsTableRowIdle({
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
-                <td className="px-6 py-4 text-left whitespace-nowrap">
-                    {kart.markdownNotes || "-"}
-                </td>
+                <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
                 <td className="font-medium text-center whitespace-nowrap">
                     <button
                         className="p-5 text-blue-600 hover:text-blue-900"
@@ -454,7 +511,7 @@ function KartsTableHeaderIdle() {
     return (
         <thead className="bg-gray-50">
             <tr>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-96">
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                     Id
                 </th>
                 <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-44 whitespace-nowrap">

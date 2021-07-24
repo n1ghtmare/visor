@@ -43,7 +43,7 @@ function EditModalPit({
     onSubmit: (kart: Kart) => void;
 }) {
     // TODO: See what kind of validation rules these inputs need?
-    const [markdownNotes, setMarkdownNotes] = useState<string>("");
+    const [markdownNotes, setMarkdownNotes] = useState<string>(kart.markdownNotes || "");
     const [classificationType, setClassificationType] = useState<ClassificationType>(
         kart.classificationType
     );
@@ -440,9 +440,7 @@ function KartsTableRowPit({
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
-                <td className="px-6 py-4 text-left whitespace-nowrap">
-                    {kart.markdownNotes || "-"}
-                </td>
+                <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
                 <td className="font-medium text-right whitespace-nowrap">
                     <button
                         className="p-5 text-blue-600 hover:text-blue-900"
@@ -470,7 +468,7 @@ function KartsTableHeaderPit() {
     return (
         <thead className="bg-gray-50">
             <tr>
-                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase w-96 whitespace-nowrap">
+                <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap">
                     Id
                 </th>
                 <th className="w-40 px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
