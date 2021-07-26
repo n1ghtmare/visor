@@ -1,20 +1,25 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 
 import { getEventCompositesByUserId } from "database/repository";
+import withSession, { NextIronRequest } from "helpers/session";
 import sleep from "helpers/sleep";
 
 import EventComposite from "entities/EventComposite";
+import UserComposite from "entities/UserComposite";
 
-// TODO: needs to be removed and we need to get it from the session
-const MOCK_USER_ID = 1;
+export default withSession(async function handler(req: NextIronRequest, res: NextApiResponse) {
+    const currentUser = req.session.get<UserComposite>("currentUser");
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (!currentUser) {
+        res.status(403).json({ message: "Forbidden" });
+    }
+
     // GET: api/events/composite
     if (req.method === "GET") {
         await sleep(3000);
-        const events: EventComposite[] = await getEventCompositesByUserId(MOCK_USER_ID);
+        const events: EventComposite[] = await getEventCompositesByUserId(currentUser.id);
         res.status(200).json(events);
     } else {
         res.status(405).json({ message: "Method not allowed" });
     }
-}
+});

@@ -8,6 +8,7 @@ import ClassificationType from "entities/ClassificationType";
 import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
 import EventComposite from "entities/EventComposite";
+import User from "entities/User";
 
 const NO_OF_POSSIBLE_COLORS = 256 ** 3;
 
@@ -278,4 +279,23 @@ export async function getPitsByEventId(eventId: number): Promise<Pit[]> {
     await db.close();
 
     return result as Pit[];
+}
+
+export async function getUserByUsername(username: string): Promise<User> {
+    const db = await openConnection();
+
+    const result = await db.get(
+        `SELECT
+            id,
+            username,
+            password,
+            display_name AS displayName
+        FROM users
+        WHERE username = ?`,
+        [username]
+    );
+
+    await db.close();
+
+    return result as User;
 }

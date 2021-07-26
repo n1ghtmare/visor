@@ -1,16 +1,21 @@
+import React from "react";
 import Head from "next/head";
 import { mutate } from "swr";
 
 import { useEventComposites } from "hooks/EventHooks";
+import useUser from "hooks/UserHooks";
 
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";
+import Header from "components/Shared/Header";
+
 import EventsTable from "components/EventsTable";
 import EventsTableBody from "components/EventsTableBody";
 import EventsTableEmptyRow from "components/EventsTableEmptyRow";
 import EventsTableFooter from "components/EventsTableFooter";
 import EventsTableHeader from "components/EventsTableHeader";
 import EventsTableRow from "components/EventsTableRow";
+import Layout from "components/Shared/Layout";
 
 async function deleteEvent(id: number): Promise<void> {
     const response = await fetch(`/api/events/${id}`, {
@@ -29,7 +34,8 @@ async function deleteEvent(id: number): Promise<void> {
 }
 
 export default function Index() {
-    const { events, isLoading, isError, isValidating } = useEventComposites();
+    const { user } = useUser({ redirectTo: "/login" });
+    const { events, isLoading, isError, isValidating } = useEventComposites(user?.id);
 
     async function handleDeleteConfirm(id: number) {
         mutate(
@@ -51,15 +57,16 @@ export default function Index() {
         );
     }
 
-    if (isLoading) return <LoadingIndicator />;
+    if (isLoading || !user?.isLoggedIn) {
+        return (
+            <Layout pageTitle="Visor - Loading data..." shouldDisplayHeader={false}>
+                <LoadingIndicator />
+            </Layout>
+        );
+    }
 
     return (
-        <>
-            <Head>
-                <title>Visor - List Events</title>
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-
+        <Layout pageTitle="Visor - List Events">
             <main role="main">
                 <h1 className="text-4xl font-bold tracking-tight">Events</h1>
 
@@ -84,6 +91,6 @@ export default function Index() {
                 </div>
                 {isValidating && <RefetchingIndicator />}
             </main>
-        </>
+        </Layout>
     );
 }

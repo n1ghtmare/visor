@@ -6,14 +6,18 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { groupedMapByStatusType } from "helpers/data";
+import useUser from "hooks/UserHooks";
 
 import PostEventResponseData from "entities/PostEventResponseData";
 import EventComposite from "entities/EventComposite";
 import StatusType from "entities/StatusType";
 import Kart from "entities/Kart";
+
 import Button from "components/Shared/Button";
 import Input from "components/Shared/Input";
 import IconPlay from "components/Shared/IconPlay";
+import LoadingIndicator from "components/Shared/LoadingIndicator";
+import Layout from "components/Shared/Layout";
 
 type CreateFormInputs = {
     name: string;
@@ -40,7 +44,7 @@ async function createEvent(data: CreateFormInputs): Promise<PostEventResponseDat
     return serverData as PostEventResponseData;
 }
 
-export default function Setup() {
+export default function Create() {
     const {
         register,
         handleSubmit,
@@ -51,6 +55,7 @@ export default function Setup() {
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { user } = useUser({ redirectTo: "/login" });
 
     async function onSubmit(data: CreateFormInputs) {
         setIsLoading(true);
@@ -83,20 +88,22 @@ export default function Setup() {
         router.push("/events");
     }
 
-    return (
-        <>
-            <Head>
-                <title>Visor - Create Event</title>
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
+    if (isLoading || !user?.isLoggedIn)
+        return (
+            <Layout pageTitle="Visor - Loading data..." shouldDisplayHeader={false}>
+                <LoadingIndicator />
+            </Layout>
+        );
 
+    return (
+        <Layout pageTitle="Visor - Create Event">
             <div className="flex flex-col items-center">
-                <main className="w-2/4">
+                <main role="main" className="w-2/4">
                     <h1 className="text-4xl font-bold tracking-tight">Create Event</h1>
 
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="mt-16 bg-white border rounded-lg shadow divide-y divide-gray-200"
+                        className="mt-16 overflow-hidden bg-white border border-gray-300 rounded-lg shadow divide-y divide-gray-200"
                     >
                         <div className="px-6 py-3">
                             <div className="mt-4">
@@ -229,6 +236,6 @@ export default function Setup() {
                     </form>
                 </main>
             </div>
-        </>
+        </Layout>
     );
 }

@@ -1,14 +1,14 @@
+import React, { useEffect, useState } from "react";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
-import React, { useEffect, useState } from "react";
+import { mutate } from "swr";
 
 import { useKarts } from "hooks/KartHooks";
 import { useEvent } from "hooks/EventHooks";
+import { groupedMapByStatusType } from "helpers/data";
 
 import StatusType from "entities/StatusType";
 import Kart from "entities/Kart";
-
-import { groupedMapByStatusType } from "helpers/data";
 
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";
@@ -21,7 +21,8 @@ import KartsTablePit from "components/KartsTablePit";
 import KartsTableIdle from "components/KartsTableIdle";
 import KartsTableRacing from "components/KartsTableRacing";
 import LinkPill from "components/EventDetails/LinkPill";
-import { mutate } from "swr";
+import useUser from "hooks/UserHooks";
+import Layout from "components/Shared/Layout";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const { eventId, status } = context.query;
@@ -68,6 +69,7 @@ async function updateKart(kart: Kart): Promise<void> {
 
 export default function EventDetails({ id, status }: { id: number; status?: string }) {
     const [statusType, setStatusType] = useState<StatusType>(StatusType.Racing);
+    const { user } = useUser({ redirectTo: "/login" });
 
     useEffect(() => {
         setStatusType(parseStatus(status) || StatusType.Racing);
@@ -78,25 +80,31 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         isLoading: isLoadingKarts,
         isError: isErrorKarts,
         isValidating: isValidatingKarts
-    } = useKarts(id);
+    } = useKarts(id, user?.id);
 
     const {
         event,
         isLoading: isLoadingEvent,
         isError: isErrorEvent,
         isValidating: isValidatingEvent
-    } = useEvent(id);
+    } = useEvent(id, user?.id);
 
     if (isErrorKarts || isErrorEvent) {
         return (
-            <div className="text-center">
-                <strong>Error:</strong> Failed to load data...
-            </div>
+            <Layout pageTitle="Visor - Loading data..." shouldDisplayHeader={false}>
+                <div className="text-center">
+                    <strong>Error:</strong> Failed to load data...
+                </div>
+            </Layout>
         );
     }
 
-    if (isLoadingKarts || isLoadingEvent) {
-        return <LoadingIndicator />;
+    if (isLoadingKarts || isLoadingEvent || !user?.isLoggedIn) {
+        return (
+            <Layout pageTitle="Visor - Loading data..." shouldDisplayHeader={false}>
+                <LoadingIndicator />
+            </Layout>
+        );
     }
 
     async function handleEditConfirm(kart: Kart) {
@@ -147,11 +155,7 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
     }
 
     return (
-        <>
-            <Head>
-                <title>Visor - Event / {event.name}</title>
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
+        <Layout pageTitle={`Visor - Event / ${event.name}`}>
             <main role="main">
                 <div className="flex items-end">
                     <h1 className="flex-1 text-4xl font-bold tracking-tight">{event.name}</h1>
@@ -191,6 +195,6 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
                 <div className="mt-4">{renderKartsTable()}</div>
                 {(isValidatingKarts || isValidatingEvent) && <RefetchingIndicator />}
             </main>
-        </>
+        </Layout>
     );
 }

@@ -4,9 +4,9 @@ import fetcher from "helpers/fetcher";
 
 import Kart from "entities/Kart";
 
-export function useKarts(eventId: number) {
+export function useKarts(eventId: number, currentUserId?: number) {
     const { data, error, isValidating } = useSWR<Kart[]>(
-        eventId ? `/api/events/${eventId}/karts` : null,
+        eventId && currentUserId ? `/api/events/${eventId}/karts` : null,
         fetcher
     );
 

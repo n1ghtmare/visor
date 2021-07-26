@@ -1,24 +1,24 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 
 import { deleteEvent } from "database/repository";
 import { validateRequestAndGetEvent } from "helpers/api";
 import sleep from "helpers/sleep";
 
 import Event from "entities/Event";
+import withSession, { NextIronRequest } from "helpers/session";
 
-async function handleDelete(req: NextApiRequest, res: NextApiResponse) {
+async function handleDelete(req: NextIronRequest, res: NextApiResponse) {
     // TODO: Remove before production
     // simulate long working hours
     await sleep(3000);
 
     const event: Event = await validateRequestAndGetEvent(req, res);
-
     await deleteEvent(event.id);
 
     res.status(200).json({ message: `Success deleting event with id: ${event.id}` });
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+async function handleGet(req: NextIronRequest, res: NextApiResponse) {
     // TODO: Remove before production
     // simulate long working hours
     await sleep(3000);
@@ -28,7 +28,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     res.status(200).json(event);
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withSession(async function handler(req: NextIronRequest, res: NextApiResponse) {
     // GET: api/events/[id]
     if (req.method === "GET") {
         await handleGet(req, res);
@@ -41,4 +41,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     else {
         res.status(405).json({ message: "Method not allowed" });
     }
-}
+});

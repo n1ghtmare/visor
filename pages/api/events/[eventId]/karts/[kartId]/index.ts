@@ -1,13 +1,14 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 
-import { getKart, updateKart } from "database/repository";
+import withSession, { NextIronRequest } from "helpers/session";
 import { validateRequestAndGetEvent } from "helpers/api";
 import sleep from "helpers/sleep";
+import { getKart, updateKart } from "database/repository";
 
 import Event from "entities/Event";
 import Kart from "entities/Kart";
 
-async function handlePut(req: NextApiRequest, res: NextApiResponse) {
+async function handlePut(req: NextIronRequest, res: NextApiResponse) {
     // TODO: Remove before production
     // simulate long working hours
     await sleep(3000);
@@ -31,7 +32,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
     res.status(200).json({ message: `Success updating kart with id: ${event.id}` });
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withSession(async function handler(req: NextIronRequest, res: NextApiResponse) {
     // DELETE: api/events/[id]/karts/[id]
     if (req.method === "PUT") {
         await handlePut(req, res);
@@ -40,4 +41,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     else {
         res.status(405).json({ message: "Method not allowed" });
     }
-}
+});

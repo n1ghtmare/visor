@@ -1,16 +1,10 @@
-import Head from "next/head";
-
 import IconArrowNarrowRight from "components/Shared/IconArrowNarrowRight";
 import LinkButton from "components/Shared/LinkButton";
+import Layout from "components/Shared/Layout";
 
 export default function Home() {
     return (
-        <>
-            <Head>
-                <title>Visor</title>
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-
+        <Layout pageTitle="Visor" shouldDisplayHeader={false}>
             <main className="text-center">
                 <h1 className="text-6xl font-bold">Welcome to Visor</h1>
 
@@ -25,6 +19,6 @@ export default function Home() {
                     </LinkButton>
                 </div>
             </main>
-        </>
+        </Layout>
     );
 }
