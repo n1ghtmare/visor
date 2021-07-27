@@ -72,9 +72,9 @@ export default async function openConnection() {
             )
             VALUES (
                 1,
-                'test_username',
-                '$2y$12$A/nKPxRAgjWFmE4Rj0TFwuD6/4NwVrHjFeueLJp4slkowrcmy.GF6',
-                'test_display_name'
+                'admin',
+                '$2a$12$6w09Cc7qFJPykqtHYdQ1qeuZPxJdvYCWRHYE.joJWCdg/WdErWSP2',
+                'Administrator'
             )`
         );
 

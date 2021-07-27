@@ -3,10 +3,14 @@
 function getSeriesGapsInSortedArray(sortedArr: number[]): number[] {
     const gaps = [];
 
+    console.log({ sortedArr });
     // add padding values
     for (let i = 1; i < sortedArr[0]; i++) {
+        console.log(sortedArr[0]);
         gaps.push(i);
     }
+
+    console.log({ gaps });
 
     for (let i = 0; i < sortedArr.length; i++) {
         const gap = sortedArr[i + 1] - sortedArr[i];
@@ -43,14 +47,20 @@ function getSeriesInSortedArray(sortedArr: number[]): number[][] {
 export default function AvailableEventNosNotice({ eventNosInUse }: { eventNosInUse: number[] }) {
     function generateHumanizedNotice(): string {
         const sortedArr: number[] = eventNosInUse.slice(0).sort((a, b) => a - b);
-        const gaps: number[] = getSeriesGapsInSortedArray(eventNosInUse);
+        const gaps: number[] = getSeriesGapsInSortedArray(sortedArr);
         const series: number[][] = getSeriesInSortedArray(gaps);
 
         const humanized: string[] = series.map((x) =>
             x.length > 2 ? `${x[0]}...${x[x.length - 1]}` : x.toString()
         );
 
-        return `${humanized.join(", ")} or >${sortedArr[sortedArr.length - 1]}`;
+        const affix = `>${sortedArr[sortedArr.length - 1]}`;
+
+        if (humanized.length === 0) {
+            return affix;
+        }
+
+        return `${humanized.join(", ")} or ${affix}`;
     }
 
     return (

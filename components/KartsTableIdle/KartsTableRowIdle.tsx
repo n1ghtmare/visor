@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import Tooltip from "@tippyjs/react";
+
 import Kart from "entities/Kart";
 
 import ClassificationBadge from "components/Shared/ClassificationBadge";
@@ -72,22 +74,26 @@ export default function KartsTableRowIdle({
                 </td>
                 <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
                 <td className="font-medium text-center whitespace-nowrap">
-                    <button
-                        className="p-5 text-blue-600 hover:text-blue-900"
-                        title="Edit"
-                        onClick={handleEditClick}
-                    >
-                        <IconPencilAlt />
-                    </button>
+                    <Tooltip content="Edit kart metadata" className="-mb-4">
+                        <button
+                            className="p-5 text-blue-600 hover:text-blue-900"
+                            title="Edit"
+                            onClick={handleEditClick}
+                        >
+                            <IconPencilAlt />
+                        </button>
+                    </Tooltip>
                 </td>
                 <td className="font-medium text-center whitespace-nowrap">
-                    <button
-                        className="p-5 text-blue-600 hover:text-blue-900"
-                        title="Move"
-                        onClick={handleMoveClick}
-                    >
-                        <IconSwitchHorizontal />
-                    </button>
+                    <Tooltip content="Move kart / change status" className="-mb-4">
+                        <button
+                            className="p-5 text-blue-600 hover:text-blue-900"
+                            title="Move"
+                            onClick={handleMoveClick}
+                        >
+                            <IconSwitchHorizontal />
+                        </button>
+                    </Tooltip>
                 </td>
             </tr>
         </>
