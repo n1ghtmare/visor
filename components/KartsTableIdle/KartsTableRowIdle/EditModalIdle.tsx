@@ -69,7 +69,7 @@ export default function EditModalIdle({
                                 checked={classificationType === ClassificationType.SlowAF}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-red-200 rounded" />
+                            <div className="w-6 min-h-full bg-yellow-400 rounded" />
                         </div>
                         <div className="flex px-4 py-2 border rounded">
                             <Radio
@@ -89,7 +89,7 @@ export default function EditModalIdle({
                                 checked={classificationType === ClassificationType.Medium}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-green-400 rounded" />
+                            <div className="w-6 min-h-full bg-blue-400 rounded" />
                         </div>
                         <div className="flex px-4 py-2 border rounded">
                             <Radio
@@ -99,7 +99,7 @@ export default function EditModalIdle({
                                 checked={classificationType === ClassificationType.Fast}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-yellow-400 rounded" />
+                            <div className="w-6 min-h-full bg-green-400 rounded" />
                         </div>
                         <div className="flex px-4 py-2 border rounded">
                             <Radio

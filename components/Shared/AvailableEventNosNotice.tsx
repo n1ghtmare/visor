@@ -3,7 +3,6 @@
 function getSeriesGapsInSortedArray(sortedArr: number[]): number[] {
     const gaps = [];
 
-    console.log({ sortedArr });
     // add padding values
     for (let i = 1; i < sortedArr[0]; i++) {
         console.log(sortedArr[0]);

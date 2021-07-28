@@ -7,7 +7,7 @@ export default function ClassificationBadge({ value }: { value: ClassificationTy
 
     if (value === ClassificationType.SlowAF) {
         return (
-            <div className="inline-flex px-3 py-2 font-bold leading-none bg-red-200 rounded shadow-sm">
+            <div className="inline-flex px-3 py-2 font-bold leading-none bg-yellow-400 rounded shadow-sm">
                 Slow AF
             </div>
         );
@@ -23,7 +23,7 @@ export default function ClassificationBadge({ value }: { value: ClassificationTy
 
     if (value === ClassificationType.Medium) {
         return (
-            <div className="inline-flex px-3 py-2 font-bold leading-none bg-green-400 rounded shadow-sm">
+            <div className="inline-flex px-3 py-2 font-bold leading-none text-white bg-blue-400 rounded shadow-sm">
                 {ClassificationType[value]}
             </div>
         );
@@ -31,7 +31,7 @@ export default function ClassificationBadge({ value }: { value: ClassificationTy
 
     if (value === ClassificationType.Fast) {
         return (
-            <div className="inline-flex px-3 py-2 font-bold leading-none bg-yellow-400 rounded shadow-sm">
+            <div className="inline-flex px-3 py-2 font-bold leading-none text-white bg-green-400 rounded shadow-sm">
                 {ClassificationType[value]}
             </div>
         );
