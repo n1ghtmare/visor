@@ -5,7 +5,7 @@ import { mutate } from "swr";
 
 import { useKarts } from "hooks/KartHooks";
 import { useEvent } from "hooks/EventHooks";
-import { groupedMapByStatusType } from "helpers/data";
+import { groupedMapByPitId, groupedMapByStatusType } from "helpers/data";
 
 import StatusType from "entities/StatusType";
 import Kart from "entities/Kart";
@@ -23,6 +23,7 @@ import KartsTableRacing from "components/KartsTableRacing";
 import LinkPill from "components/EventDetails/LinkPill";
 import useUser from "hooks/UserHooks";
 import Layout from "components/Shared/Layout";
+import { usePits } from "hooks/PitHooks";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const { eventId, status } = context.query;
@@ -89,7 +90,9 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         isValidating: isValidatingEvent
     } = useEvent(id, user?.id);
 
-    if (isErrorKarts || isErrorEvent) {
+    const { pits, isLoading: isLoadingPits, isError: isErrorPits } = usePits(id);
+
+    if (isErrorKarts || isErrorEvent || isErrorPits) {
         return (
             <Layout pageTitle="Visor - Loading data..." shouldDisplayHeader={false}>
                 <div className="text-center">
@@ -99,7 +102,7 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         );
     }
 
-    if (isLoadingKarts || isLoadingEvent || !user?.isLoggedIn) {
+    if (isLoadingKarts || isLoadingEvent || isLoadingPits || !user?.isLoggedIn) {
         return (
             <Layout pageTitle="Visor - Loading data..." shouldDisplayHeader={false}>
                 <LoadingIndicator />
@@ -116,11 +119,9 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
             false
         );
 
-        // TODO: Add an mutation for the new kart
-
         await updateKart(kart);
 
-        // TODO: Mutate all karts from server (sync)
+        // Mutate all karts from server (sync)
         mutate(kartsApiUrl);
     }
 
@@ -130,15 +131,25 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         const filteredKarts = grouped.get(statusType);
 
         if (statusType === StatusType.Racing) {
-            return <KartsTableRacing karts={filteredKarts} onEditConfirm={handleEditConfirm} />;
+            return (
+                <KartsTableRacing
+                    karts={filteredKarts}
+                    pits={pits}
+                    onEditConfirm={handleEditConfirm}
+                />
+            );
         }
 
         const eventNosInUse = karts.filter((x) => x.eventNo !== null).map((x) => x.eventNo);
 
         if (statusType === StatusType.Pit) {
+            const groupedPit = groupedMapByPitId(filteredKarts);
+            const groupedPitKeys = Array.from(groupedPit.keys());
+
             return (
                 <KartsTablePit
                     karts={filteredKarts}
+                    pits={pits}
                     onEditConfirm={handleEditConfirm}
                     eventNosInUse={eventNosInUse}
                 />
@@ -148,6 +159,7 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         return (
             <KartsTableIdle
                 karts={filteredKarts}
+                pits={pits}
                 onEditConfirm={handleEditConfirm}
                 eventNosInUse={eventNosInUse}
             />

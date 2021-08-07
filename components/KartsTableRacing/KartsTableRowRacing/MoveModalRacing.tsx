@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { usePits } from "hooks/PitHooks";
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
 import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
+import Pit from "entities/Pit";
 
 import Button from "components/Shared/Button";
 import ButtonOutline from "components/Shared/ButtonOutline";
@@ -17,10 +17,12 @@ import Radio from "components/Shared/Radio";
 
 export default function MoveModalRacing({
     kart,
+    pits,
     onCancel,
     onSubmit
 }: {
     kart: Kart;
+    pits: Pit[];
     onCancel: () => void;
     onSubmit: (kart: Kart) => void;
 }) {
@@ -29,8 +31,6 @@ export default function MoveModalRacing({
     const [isValidationError, setIsValidationError] = useState<boolean>(false);
 
     const modalRef = useRef<HTMLDivElement>(null);
-
-    const { pits, isLoading, isError } = usePits(kart.eventId);
 
     useEscCancel(onCancel);
     useOutsideRefsClick([modalRef], onCancel);
@@ -92,22 +92,6 @@ export default function MoveModalRacing({
 
         setStatusType(newStatusType);
         setPitId(newPitId);
-    }
-
-    if (isError) {
-        return (
-            <Modal title="Error" ref={modalRef}>
-                <div className="text-center">Failed to load data...</div>
-            </Modal>
-        );
-    }
-
-    if (isLoading) {
-        return (
-            <Modal ref={modalRef}>
-                <LoadingIndicatorFlat />
-            </Modal>
-        );
     }
 
     return (

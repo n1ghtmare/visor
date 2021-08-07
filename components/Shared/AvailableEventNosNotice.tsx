@@ -5,11 +5,8 @@ function getSeriesGapsInSortedArray(sortedArr: number[]): number[] {
 
     // add padding values
     for (let i = 1; i < sortedArr[0]; i++) {
-        console.log(sortedArr[0]);
         gaps.push(i);
     }
-
-    console.log({ gaps });
 
     for (let i = 0; i < sortedArr.length; i++) {
         const gap = sortedArr[i + 1] - sortedArr[i];
@@ -45,6 +42,10 @@ function getSeriesInSortedArray(sortedArr: number[]): number[][] {
 
 export default function AvailableEventNosNotice({ eventNosInUse }: { eventNosInUse: number[] }) {
     function generateHumanizedNotice(): string {
+        if (eventNosInUse.length === 0) {
+            return ">0";
+        }
+
         const sortedArr: number[] = eventNosInUse.slice(0).sort((a, b) => a - b);
         const gaps: number[] = getSeriesGapsInSortedArray(sortedArr);
         const series: number[][] = getSeriesInSortedArray(gaps);

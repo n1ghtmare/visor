@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Tooltip from "@tippyjs/react";
 
 import Kart from "entities/Kart";
+import Pit from "entities/Pit";
 
 import ClassificationBadge from "components/Shared/ClassificationBadge";
 import EventNoBadge from "components/Shared/EventNoBadge";
@@ -15,9 +16,11 @@ import MoveModalRacing from "./KartsTableRowRacing/MoveModalRacing";
 
 export default function KartsTableRowRacing({
     kart,
+    pits,
     onEditConfirm
 }: {
     kart: Kart;
+    pits: Pit[];
     onEditConfirm: (kart: Kart) => void;
 }) {
     const [isMoving, setIsMoving] = useState<boolean>(false);
@@ -49,6 +52,7 @@ export default function KartsTableRowRacing({
             {isMoving && (
                 <MoveModalRacing
                     key="move-modal-racing"
+                    pits={pits}
                     kart={kart}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}

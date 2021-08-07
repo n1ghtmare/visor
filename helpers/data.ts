@@ -13,3 +13,12 @@ export function groupedMapByStatusType(karts: Kart[]): Map<StatusType, Kart[]> {
         initialMap
     );
 }
+
+export function groupedMapByPitId(karts: Kart[]): Map<string, Kart[]> {
+    const initialMap = new Map<string, Kart[]>();
+    return karts.reduce(
+        (map: Map<string, Kart[]>, kart) =>
+            map.set(kart.pitId, [...(map.get(kart.pitId) || []), kart]),
+        initialMap
+    );
+}

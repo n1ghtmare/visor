@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Tooltip from "@tippyjs/react";
 
 import Kart from "entities/Kart";
+import Pit from "entities/Pit";
 
 import ClassificationBadge from "components/Shared/ClassificationBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
@@ -11,14 +12,15 @@ import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 
 import EditModalPit from "./KartsTableRowPit/EditModalPit";
 import MoveModalPit from "./KartsTableRowPit/MoveModalPit";
-import PitBadge from "./KartsTableRowPit/PitBadge";
 
 export default function KartsTableRowPit({
     kart,
+    pits,
     onEditConfirm,
     eventNosInUse
 }: {
     kart: Kart;
+    pits: Pit[];
     onEditConfirm: (kart: Kart) => void;
     eventNosInUse: number[];
 }) {
@@ -51,6 +53,7 @@ export default function KartsTableRowPit({
             {isMoving && (
                 <MoveModalPit
                     kart={kart}
+                    pits={pits}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
                     eventNosInUse={eventNosInUse}
@@ -66,9 +69,6 @@ export default function KartsTableRowPit({
             )}
             <tr className="hover:bg-blue-50 hover:cursor-pointer">
                 <td className="px-6 py-3 font-medium text-left">{kart.id}</td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <PitBadge name={kart.pitName} colorHex={kart.pitColorHex} />
-                </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <PreviousEventNoBadge value={kart.previousEventNo} />
                 </td>

@@ -14,9 +14,9 @@ async function handleGet(req: NextIronRequest, res: NextApiResponse) {
     await sleep(3000);
 
     const event: Event = await validateRequestAndGetEvent(req, res);
-    const karts: Pit[] = await getPitsByEventId(event.id);
+    const pits: Pit[] = await getPitsByEventId(event.id);
 
-    res.status(200).json(karts);
+    res.status(200).json(pits);
 }
 
 export default withSession(async function handler(req: NextIronRequest, res: NextApiResponse) {

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Tooltip from "@tippyjs/react";
 
 import Kart from "entities/Kart";
+import Pit from "entities/Pit";
 
 import ClassificationBadge from "components/Shared/ClassificationBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
@@ -14,10 +15,12 @@ import MoveModalIdle from "./KartsTableRowIdle/MoveModalIdle";
 
 export default function KartsTableRowIdle({
     kart,
+    pits,
     eventNosInUse,
     onEditConfirm
 }: {
     kart: Kart;
+    pits: Pit[];
     eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
 }) {
@@ -50,6 +53,7 @@ export default function KartsTableRowIdle({
             {isMoving && (
                 <MoveModalIdle
                     kart={kart}
+                    pits={pits}
                     onSubmit={handleSubmit}
                     onCancel={handleModalCancelClick}
                     eventNosInUse={eventNosInUse}

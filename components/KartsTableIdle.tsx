@@ -1,6 +1,7 @@
 import React from "react";
 
 import Kart from "entities/Kart";
+import Pit from "entities/Pit";
 
 import KartsTable from "./Shared/KartsTable";
 import KartsTableBody from "./Shared/KartsTableBody";
@@ -11,10 +12,12 @@ import KartsTableRowIdle from "./KartsTableIdle/KartsTableRowIdle";
 
 export default function KartsTableIdle({
     karts,
+    pits,
     eventNosInUse,
     onEditConfirm
 }: {
     karts: Kart[];
+    pits: Pit[];
     eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
 }) {
@@ -34,6 +37,7 @@ export default function KartsTableIdle({
                         <KartsTableRowIdle
                             key={x.id}
                             kart={x}
+                            pits={pits}
                             eventNosInUse={eventNosInUse}
                             onEditConfirm={onEditConfirm}
                         />

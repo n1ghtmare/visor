@@ -1,10 +1,10 @@
 import React, { useState, useRef } from "react";
 
-import { usePits } from "hooks/PitHooks";
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
 import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
+import Pit from "entities/Pit";
 
 import LoadingIndicatorFlat from "components/Shared/LoadingIndicatorFlat";
 import AvailableEventNosNotice from "components/Shared/AvailableEventNosNotice";
@@ -20,11 +20,13 @@ import Modal from "components/Shared/Modal";
 
 export default function MoveModalPit({
     kart,
+    pits,
     onCancel,
     onSubmit,
     eventNosInUse
 }: {
     kart: Kart;
+    pits: Pit[];
     onCancel: () => void;
     onSubmit: (kart: Kart) => void;
     eventNosInUse: number[];
@@ -37,8 +39,6 @@ export default function MoveModalPit({
     const [eventNo, setEventNo] = useState<string>("");
 
     const modalRef = useRef<HTMLDivElement>(null);
-
-    const { pits, isLoading, isError } = usePits(kart.eventId);
 
     useEscCancel(onCancel);
     useOutsideRefsClick([modalRef], onCancel);
@@ -90,6 +90,10 @@ export default function MoveModalPit({
             setValidationErrorForEventNo(`${newEventNo} is already in use.`);
         }
 
+        if (newEventNo <= 0) {
+            setValidationErrorForEventNo("Has to greater than 0.");
+        }
+
         setEventNo(e.target.value);
     }
 
@@ -117,22 +121,6 @@ export default function MoveModalPit({
         setValidationErrorForStatus(null);
         setValidationErrorForEventNo(null);
         setEventNo("");
-    }
-
-    if (isError) {
-        return (
-            <Modal title="Error" ref={modalRef}>
-                <div className="text-center">Failed to load data...</div>
-            </Modal>
-        );
-    }
-
-    if (isLoading) {
-        return (
-            <Modal ref={modalRef}>
-                <LoadingIndicatorFlat />
-            </Modal>
-        );
     }
 
     return (
