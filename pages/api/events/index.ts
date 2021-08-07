@@ -8,6 +8,7 @@ import Pit from "entities/Pit";
 import Kart from "entities/Kart";
 import PostEventResponseData from "entities/PostEventResponseData";
 import UserComposite from "entities/UserComposite";
+import PitColorMap from "entities/PitColorMap";
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -17,7 +18,7 @@ type PostRequestData = {
     name: string;
     noOfTotalKarts: number;
     noOfStartingKarts: number;
-    noOfPits: number;
+    pitColorMaps: PitColorMap[];
 };
 
 // Routes Design for the API (authenticated):
@@ -30,7 +31,7 @@ async function handlePost(req: NextIronRequest, res: NextApiResponse, currentUse
     const requestData = req.body as PostRequestData;
 
     const event: Event = await createEvent(requestData.name, currentUser.id);
-    const pits: Pit[] = await createPits(event.id, requestData.noOfPits);
+    const pits: Pit[] = await createPits(event.id, requestData.pitColorMaps);
     const karts: Kart[] = await createKarts(
         event.id,
         requestData.noOfTotalKarts,

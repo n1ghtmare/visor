@@ -77,7 +77,6 @@ export default function KartsTableRowIdle({
                     <Tooltip content="Edit kart metadata" className="-mb-4">
                         <button
                             className="p-5 text-blue-600 hover:text-blue-900"
-                            title="Edit"
                             onClick={handleEditClick}
                         >
                             <IconPencilAlt />
@@ -88,7 +87,6 @@ export default function KartsTableRowIdle({
                     <Tooltip content="Move kart / change status" className="-mb-4">
                         <button
                             className="p-5 text-blue-600 hover:text-blue-900"
-                            title="Move"
                             onClick={handleMoveClick}
                         >
                             <IconSwitchHorizontal />

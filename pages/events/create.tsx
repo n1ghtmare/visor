@@ -1,12 +1,15 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { HexColorPicker } from "react-colorful";
 import { mutate } from "swr";
 
 import { useRouter } from "next/router";
 
 import { groupedMapByStatusType } from "helpers/data";
 import useUser from "hooks/UserHooks";
+import { useDebounce } from "hooks/UtilityHooks";
 
+import PitColorMap from "entities/PitColorMap";
 import PostEventResponseData from "entities/PostEventResponseData";
 import EventComposite from "entities/EventComposite";
 import StatusType from "entities/StatusType";
@@ -17,8 +20,6 @@ import Input from "components/Shared/Input";
 import IconPlay from "components/Shared/IconPlay";
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import Layout from "components/Shared/Layout";
-import { useOutsideRefsClick } from "hooks/UtilityHooks";
-import { HexColorPicker } from "react-colorful";
 import IconXCircle from "components/Shared/IconXCircle";
 
 type CreateFormInputs = {
@@ -26,6 +27,7 @@ type CreateFormInputs = {
     noOfTotalKarts: number;
     noOfStartingKarts: number;
     noOfPits: number;
+    pitColorMaps: PitColorMap[];
 };
 
 async function createEvent(data: CreateFormInputs): Promise<PostEventResponseData> {
@@ -48,7 +50,7 @@ async function createEvent(data: CreateFormInputs): Promise<PostEventResponseDat
 
 function PitColorPicker({
     name,
-    colorHex: colorInHex,
+    colorHex,
     onChange
 }: {
     name: string;
@@ -58,10 +60,23 @@ function PitColorPicker({
     const popoverRef = useRef<HTMLDivElement>(null);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [currentColorHex, setCurrentColorHex] = useState<string>(colorHex);
+
+    const debouncedColorHex = useDebounce(currentColorHex, 500);
+
+    useEffect(() => {
+        if (colorHex !== debouncedColorHex) {
+            onChange(debouncedColorHex);
+        }
+    }, [colorHex, debouncedColorHex, onChange]);
 
     function handleCloseClick(e: React.MouseEvent<HTMLAnchorElement>) {
         e.preventDefault();
         setIsOpen(false);
+    }
+
+    function handleHexColorPickerChange(newColor: string) {
+        setCurrentColorHex(newColor);
     }
 
     return (
@@ -88,7 +103,7 @@ function PitColorPicker({
                 <span className="flex-1 font-medium">{name}</span>
                 <div
                     className="border border-gray-300 rounded cursor-pointer w-7 h-7"
-                    style={{ backgroundColor: colorInHex }}
+                    style={{ backgroundColor: currentColorHex }}
                     onClick={() => setIsOpen(!isOpen)}
                 />
             </div>
@@ -96,7 +111,10 @@ function PitColorPicker({
             {isOpen && (
                 <>
                     <div className="responsive" ref={popoverRef}>
-                        <HexColorPicker color={colorInHex} onChange={onChange} />
+                        <HexColorPicker
+                            color={currentColorHex}
+                            onChange={handleHexColorPickerChange}
+                        />
                     </div>
                     <div className="text-center">
                         <a
@@ -114,11 +132,7 @@ function PitColorPicker({
     );
 }
 
-type PitColorMap = {
-    name: string;
-    colorHex: string;
-};
-
+// TODO: Get better default colors from the users
 const DEFAULT_PIT_COLORS_MAP = {
     0: "#00ffc2",
     1: "#00ff0a",
@@ -138,18 +152,22 @@ export default function Create() {
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [pitColorMaps, setPitColorMaps] = useState<PitColorMap[]>();
 
     const { user } = useUser({ redirectTo: "/login" });
 
-    // TODO: Make this dynamic and for each color pit (also choose better defaults)
-    const [pitColors, setPitColors] = useState<{ name: string; colorHex }[]>();
-
     async function onSubmit(data: CreateFormInputs) {
+        // include the pit color map into the form input
+        const newData: CreateFormInputs = {
+            ...data,
+            pitColorMaps
+        };
+
         setIsLoading(true);
 
         // When creating a new event push it to the cache and re-validate entries (we already have it in the response)
         await mutate("/api/events/composite", async (events: EventComposite[]) => {
-            const { event, karts, pits } = await createEvent(data);
+            const { event, karts, pits } = await createEvent(newData);
             const grouped: Map<StatusType, Kart[]> = groupedMapByStatusType(karts);
 
             if (!events) {
@@ -169,8 +187,6 @@ export default function Create() {
                 }
             ];
         });
-
-        setIsLoading(false);
 
         router.push("/events");
     }
@@ -203,10 +219,14 @@ export default function Create() {
                 newPitColors.push({ name: `Pit ${i + 1}`, colorHex: DEFAULT_PIT_COLORS_MAP[i] });
             }
 
-            setPitColors(newPitColors);
+            setPitColorMaps(newPitColors);
         } else {
-            setPitColors(null);
+            setPitColorMaps(null);
         }
+    }
+
+    function handlePitColorPickerChange(name: string, colorHex: string) {
+        setPitColorMaps(pitColorMaps.map((x) => (x.name === name ? { ...x, colorHex } : x)));
     }
 
     return (
@@ -341,21 +361,19 @@ export default function Create() {
                                     />
                                 </div>
 
-                                {pitColors && (
+                                {pitColorMaps && (
                                     <div className="relative mt-4">
                                         <label className="font-bold">
                                             Choose your pit lane colors:
                                         </label>
                                         <div className="mt-2 space-y-3">
-                                            {pitColors.map((x) => (
+                                            {pitColorMaps.map((x) => (
                                                 <PitColorPicker
                                                     key={x.name}
                                                     name={x.name}
                                                     colorHex={x.colorHex}
-                                                    onChange={() =>
-                                                        console.log(
-                                                            "will update the pit colors here"
-                                                        )
+                                                    onChange={(newColor: string) =>
+                                                        handlePitColorPickerChange(x.name, newColor)
                                                     }
                                                 />
                                             ))}

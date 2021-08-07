@@ -1,13 +1,12 @@
 import React from "react";
-import Head from "next/head";
 import { mutate } from "swr";
 
 import { useEventComposites } from "hooks/EventHooks";
 import useUser from "hooks/UserHooks";
 
+import Layout from "components/Shared/Layout";
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";
-import Header from "components/Shared/Header";
 
 import EventsTable from "components/EventsTable";
 import EventsTableBody from "components/EventsTableBody";
@@ -15,7 +14,6 @@ import EventsTableEmptyRow from "components/EventsTableEmptyRow";
 import EventsTableFooter from "components/EventsTableFooter";
 import EventsTableHeader from "components/EventsTableHeader";
 import EventsTableRow from "components/EventsTableRow";
-import Layout from "components/Shared/Layout";
 
 async function deleteEvent(id: number): Promise<void> {
     const response = await fetch(`/api/events/${id}`, {

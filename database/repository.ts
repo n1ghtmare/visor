@@ -9,14 +9,9 @@ import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
 import EventComposite from "entities/EventComposite";
 import User from "entities/User";
+import PitColorMap from "entities/PitColorMap";
 
-const NO_OF_POSSIBLE_COLORS = 256 ** 3;
-
-// FIXME: There is an issue here that this code produces shorter character colors (such as for example: #ffff)
-const getRandomColorHex = (): string =>
-    `#${Math.floor(Math.random() * NO_OF_POSSIBLE_COLORS).toString(16)}`;
-
-export async function createPits(eventId: number, noOfPits: number): Promise<Pit[]> {
+export async function createPits(eventId: number, pitColorMaps: PitColorMap[]): Promise<Pit[]> {
     const pits: Pit[] = [];
 
     const db = await openConnection();
@@ -25,12 +20,12 @@ export async function createPits(eventId: number, noOfPits: number): Promise<Pit
         "INSERT INTO pits VALUES ($id, $eventId, $name, $colorHex, $description)"
     );
 
-    for (let i = 0; i < noOfPits; i++) {
+    for (let i = 0; i < pitColorMaps.length; i++) {
         const pit: Pit = {
             id: uuidv4(),
             eventId,
-            name: `Pit ${i + 1}`,
-            colorHex: getRandomColorHex(),
+            name: pitColorMaps[i].name,
+            colorHex: pitColorMaps[i].colorHex,
             description: null
         };
 

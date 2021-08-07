@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function useEscCancel(handler: () => void) {
     useEffect(() => {
@@ -39,4 +39,20 @@ export function useOutsideRefsClick(
             document.removeEventListener("touchstart", listener);
         };
     }, [refs, handler]);
+}
+
+export function useDebounce<T>(value: T, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
 }
