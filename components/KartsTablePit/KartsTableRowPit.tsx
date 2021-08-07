@@ -13,6 +13,17 @@ import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 import EditModalPit from "./KartsTableRowPit/EditModalPit";
 import MoveModalPit from "./KartsTableRowPit/MoveModalPit";
 
+function IdBadge({ id }: { id: string }) {
+    return (
+        <div className="flex items-baseline space-x-1">
+            <span className="font-mono">{id.substring(0, id.indexOf("-"))}</span>
+            <Tooltip content={id} className="-mb-2 font-mono">
+                <span className="underline text-gray-600 cursor-help">...</span>
+            </Tooltip>
+        </div>
+    );
+}
+
 export default function KartsTableRowPit({
     kart,
     pits,
@@ -68,7 +79,9 @@ export default function KartsTableRowPit({
                 />
             )}
             <tr className="hover:bg-blue-50 hover:cursor-pointer">
-                <td className="px-6 py-3 font-medium text-left">{kart.id}</td>
+                <td className="px-6 py-3 font-medium text-left">
+                    <IdBadge id={kart.id} />
+                </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <PreviousEventNoBadge value={kart.previousEventNo} />
                 </td>
