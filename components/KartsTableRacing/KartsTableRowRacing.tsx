@@ -13,6 +13,7 @@ import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 
 import EditModalRacing from "./KartsTableRowRacing/EditModalRacing";
 import MoveModalRacing from "./KartsTableRowRacing/MoveModalRacing";
+import IdBadge from "components/Shared/IdBadge";
 
 export default function KartsTableRowRacing({
     kart,
@@ -69,7 +70,9 @@ export default function KartsTableRowRacing({
             )}
 
             <tr className="hover:bg-blue-50 hover:cursor-pointer">
-                <td className="px-6 py-3 font-medium text-left">{kart.id}</td>
+                <td className="px-6 py-3 font-medium text-left">
+                    <IdBadge id={kart.id} />
+                </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <EventNoBadge value={kart.eventNo} />
                 </td>

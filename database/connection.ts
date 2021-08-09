@@ -1,4 +1,4 @@
-import sqlite3, { Database } from "sqlite3";
+import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
 // TODO: Add events and users table, where the events will be owned by a user_id
@@ -43,6 +43,7 @@ const CREATE_KARTS_TABLE_SQL = `
         previous_event_no INTEGER,
         classification_type_id INTEGER,
         pit_id TEXT,
+        pit_order INTEGER,
         markdown_notes TEXT,
         FOREIGN KEY(pit_id) REFERENCES pits(id),
         FOREIGN KEY(event_id) REFERENCES events(id)

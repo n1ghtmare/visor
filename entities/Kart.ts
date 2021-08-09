@@ -9,6 +9,7 @@ type Kart = {
     previousEventNo?: number;
     classificationType: ClassificationType;
     pitId?: string;
+    pitOrder?: number;
     markdownNotes?: string;
     // Aux read-only columns (returned from a join)
     pitName?: string;

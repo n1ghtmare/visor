@@ -9,6 +9,7 @@ import ClassificationBadge from "components/Shared/ClassificationBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
 import IconSwitchHorizontal from "components/Shared/IconSwitchHorizontal";
 import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
+import IdBadge from "components/Shared/IdBadge";
 
 import EditModalIdle from "./KartsTableRowIdle/EditModalIdle";
 import MoveModalIdle from "./KartsTableRowIdle/MoveModalIdle";
@@ -69,7 +70,9 @@ export default function KartsTableRowIdle({
             )}
 
             <tr className="hover:bg-blue-50 hover:cursor-pointer">
-                <td className="px-6 py-3 font-medium text-left">{kart.id}</td>
+                <td className="px-6 py-3 font-medium text-left">
+                    <IdBadge id={kart.id} />
+                </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <PreviousEventNoBadge value={kart.previousEventNo} />
                 </td>

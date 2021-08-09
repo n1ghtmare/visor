@@ -190,6 +190,7 @@ export async function getKartsByEventId(eventId: number): Promise<Kart[]> {
             k.previous_event_no AS previousEventNo,
             k.classification_type_id AS classificationType,
             k.pit_id AS pitId,
+            k.pit_order AS pitOrder,
             k.markdown_notes AS markdownNotes,
             p.name AS pitName,
             p.color_hex AS pitColorHex
@@ -216,6 +217,7 @@ export async function getKart(id: string): Promise<Kart> {
             k.previous_event_no AS previousEventNo,
             k.classification_type_id AS classificationType,
             k.pit_id AS pitId,
+            k.pit_order AS pitOrder,
             k.markdown_notes AS markdownNotes,
             p.name AS pitName,
             p.color_hex AS pitColorHex
@@ -240,6 +242,7 @@ export async function updateKart(kart: Kart): Promise<void> {
             previous_event_no = ?,
             classification_type_id = ?,
             pit_id = ?,
+            pit_order = ?,
             markdown_notes = ?
         WHERE id = ?`,
         [
@@ -248,6 +251,7 @@ export async function updateKart(kart: Kart): Promise<void> {
             kart.previousEventNo,
             kart.classificationType,
             kart.pitId,
+            kart.pitOrder,
             kart.markdownNotes,
             kart.id
         ]
