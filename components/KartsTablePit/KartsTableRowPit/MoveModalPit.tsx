@@ -6,7 +6,6 @@ import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
 import Pit from "entities/Pit";
 
-import LoadingIndicatorFlat from "components/Shared/LoadingIndicatorFlat";
 import AvailableEventNosNotice from "components/Shared/AvailableEventNosNotice";
 import Button from "components/Shared/Button";
 import ButtonOutline from "components/Shared/ButtonOutline";

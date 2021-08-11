@@ -1,12 +1,50 @@
 import { NextApiResponse } from "next";
 
+import sleep from "helpers/sleep";
 import withSession, { NextIronRequest } from "helpers/session";
 import { validateRequestAndGetEvent } from "helpers/api";
-import sleep from "helpers/sleep";
-import { getKart, updateKart } from "database/repository";
+import {
+    getKart,
+    getMaxPitOrderIdByPitId,
+    resetPitOrdersByPitId,
+    updateKart
+} from "database/repository";
 
 import Event from "entities/Event";
 import Kart from "entities/Kart";
+import StatusType from "entities/StatusType";
+
+async function setInitialPitOrderToKartIfNeeded(existingKart: Kart, requestKart: Kart) {
+    // We're either moving the kart from another statusType or we're moving from one pit to another, either way we should set the correct pitOrder (max + 1 or 0 + 1.5)
+    if (
+        (requestKart.statusType === StatusType.Pit && existingKart.statusType !== StatusType.Pit) ||
+        (requestKart.statusType === StatusType.Pit &&
+            existingKart.statusType === StatusType.Pit &&
+            requestKart.pitId !== existingKart.pitId)
+    ) {
+        const maxPitOrder = await getMaxPitOrderIdByPitId(requestKart.pitId);
+
+        // The order should be 1.5, 2.5, 3.5 etc.
+        requestKart.pitOrder = maxPitOrder ? maxPitOrder + 1 : 1.5;
+    }
+
+    // Reset the pit order if we're moving the kart *out* of the pit
+    if (requestKart.statusType !== StatusType.Pit) {
+        requestKart.pitOrder = null;
+    }
+}
+
+async function handlePitOrderChangesIfNeeded(existingKart: Kart, requestKart: Kart) {
+    // If the kart pitOrder doesn't have a fraction that means it was changed by the user
+    if (requestKart.pitOrder % 1.0 === 0) {
+        await resetPitOrdersByPitId(requestKart.pitId);
+    }
+
+    // If the kart was moved from one pit to another, then we have to reset the pit orders in the previous pit
+    if (existingKart.statusType === StatusType.Pit && requestKart.pitId !== existingKart.pitId) {
+        await resetPitOrdersByPitId(existingKart.pitId);
+    }
+}
 
 async function handlePut(req: NextIronRequest, res: NextApiResponse) {
     // TODO: Remove before production
@@ -26,7 +64,12 @@ async function handlePut(req: NextIronRequest, res: NextApiResponse) {
     const requestKart = req.body as Kart;
 
     if (kart.id === requestKart.id) {
+        // Assign a new pit order only for karts that are placed in the pit from another status
+        await setInitialPitOrderToKartIfNeeded(kart, requestKart);
         await updateKart(requestKart);
+
+        // Make sure all karts are in the correct pit order
+        await handlePitOrderChangesIfNeeded(kart, requestKart);
     }
 
     res.status(200).json({ message: `Success updating kart with id: ${event.id}` });

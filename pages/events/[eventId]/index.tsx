@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { GetServerSidePropsContext } from "next";
-import Head from "next/head";
 import { mutate } from "swr";
 
 import { useKarts } from "hooks/KartHooks";
 import { useEvent } from "hooks/EventHooks";
+import { usePits } from "hooks/PitHooks";
+import { useUser } from "hooks/UserHooks";
 import { groupedMapByPitId, groupedMapByStatusType } from "helpers/data";
 
 import StatusType from "entities/StatusType";
@@ -21,9 +22,7 @@ import KartsTablePit from "components/KartsTablePit";
 import KartsTableIdle from "components/KartsTableIdle";
 import KartsTableRacing from "components/KartsTableRacing";
 import LinkPill from "components/EventDetails/LinkPill";
-import useUser from "hooks/UserHooks";
 import Layout from "components/Shared/Layout";
-import { usePits } from "hooks/PitHooks";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const { eventId, status } = context.query;
@@ -111,6 +110,23 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
     }
 
     async function handleEditConfirm(kart: Kart) {
+        const existingKart = karts.filter((x) => x.id === kart.id)[0];
+
+        if (
+            (existingKart.statusType !== StatusType.Pit && kart.statusType === StatusType.Pit) ||
+            (existingKart.statusType === StatusType.Pit &&
+                kart.statusType === StatusType.Pit &&
+                existingKart.pitId !== kart.pitId)
+        ) {
+            const kartsInSamePit = karts.filter((x) => x.pitId === kart.pitId);
+            const maxPitOrder =
+                kartsInSamePit.length === 0
+                    ? 0.5
+                    : Math.max(...kartsInSamePit.map((x) => x.pitOrder));
+
+            kart.pitOrder = maxPitOrder + 1;
+        }
+
         const kartsApiUrl = `/api/events/${id}/karts`;
 
         mutate(
@@ -143,9 +159,6 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         const eventNosInUse = karts.filter((x) => x.eventNo !== null).map((x) => x.eventNo);
 
         if (statusType === StatusType.Pit) {
-            const groupedPit = groupedMapByPitId(filteredKarts);
-            const groupedPitKeys = Array.from(groupedPit.keys());
-
             return (
                 <KartsTablePit
                     karts={filteredKarts}

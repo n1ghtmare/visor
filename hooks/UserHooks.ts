@@ -6,7 +6,7 @@ import fetcher from "helpers/fetcher";
 
 import UserComposite from "entities/UserComposite";
 
-export default function useUser({ redirectTo = "", redirectIfFound = false } = {}) {
+export function useUser({ redirectTo = "", redirectIfFound = false } = {}) {
     const { data: user, mutate: mutateUser } = useSWR<UserComposite>("/api/user", fetcher);
 
     useEffect(() => {

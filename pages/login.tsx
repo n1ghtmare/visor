@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import Head from "next/head";
+import { useForm } from "react-hook-form";
 
-import useUser from "hooks/UserHooks";
+import { useUser } from "hooks/UserHooks";
+
 import UserComposite from "entities/UserComposite";
+
 import Button from "components/Shared/Button";
 import Input from "components/Shared/Input";
 import IconLogin from "components/Shared/IconLogin";
-import { useForm } from "react-hook-form";
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import Layout from "components/Shared/Layout";
 

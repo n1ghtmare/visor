@@ -260,10 +260,44 @@ export async function updateKart(kart: Kart): Promise<void> {
     await db.close();
 }
 
+export async function getMaxPitOrderIdByPitId(pitId: string): Promise<number> {
+    const db = await openConnection();
+
+    const result = await db.get(
+        `SELECT
+            MAX(pit_order) AS maxPitOrder
+        FROM karts
+        WHERE pit_id = ?`,
+        [pitId]
+    );
+
+    await db.close();
+
+    return result.maxPitOrder as number;
+}
+
+export async function resetPitOrdersByPitId(pitId: string): Promise<void> {
+    const db = await openConnection();
+
+    const result = await db.all<{ id: number }[]>(
+        "SELECT id FROM karts WHERE pit_id = ? ORDER BY pit_order ASC",
+        [pitId]
+    );
+
+    const stmnt = await db.prepare(`UPDATE karts SET pit_order = $pitOrder WHERE id = $id`);
+
+    for (let i = 0; i < result.length; i++) {
+        await stmnt.run({ $pitOrder: i + 1.5, $id: result[i].id });
+    }
+
+    await stmnt.finalize();
+    await db.close();
+}
+
 export async function getPitsByEventId(eventId: number): Promise<Pit[]> {
     const db = await openConnection();
 
-    const result = await db.all(
+    const result = await db.all<Pit[]>(
         `SELECT
             id,
             event_id AS eventId,
@@ -277,7 +311,7 @@ export async function getPitsByEventId(eventId: number): Promise<Pit[]> {
 
     await db.close();
 
-    return result as Pit[];
+    return result;
 }
 
 export async function getUserByUsername(username: string): Promise<User> {

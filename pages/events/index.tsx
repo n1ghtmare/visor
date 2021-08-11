@@ -2,7 +2,7 @@ import React from "react";
 import { mutate } from "swr";
 
 import { useEventComposites } from "hooks/EventHooks";
-import useUser from "hooks/UserHooks";
+import { useUser } from "hooks/UserHooks";
 
 import Layout from "components/Shared/Layout";
 import LoadingIndicator from "components/Shared/LoadingIndicator";

@@ -5,7 +5,7 @@ import { mutate } from "swr";
 import { useRouter } from "next/router";
 
 import { groupedMapByStatusType } from "helpers/data";
-import useUser from "hooks/UserHooks";
+import { useUser } from "hooks/UserHooks";
 
 import PitColorMap from "entities/PitColorMap";
 import PostEventResponseData from "entities/PostEventResponseData";

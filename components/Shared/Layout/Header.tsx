@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 
-import useUser from "hooks/UserHooks";
+import { useUser } from "hooks/UserHooks";
 
 import UserComposite from "entities/UserComposite";
 

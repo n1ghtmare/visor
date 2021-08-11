@@ -78,6 +78,7 @@ export default function KartsTableRowPit({
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
+                <td className="px-6 py-4 text-center whitespace-nowrap">{kart.pitOrder}</td>
                 <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
                 <td className="font-medium text-right whitespace-nowrap">
                     <Tooltip content="Edit kart metadata" className="-mb-4">
