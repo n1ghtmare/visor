@@ -50,6 +50,7 @@ export default function KartsTablePit({
 
         return pits.map((x) => {
             const filteredKarts: Kart[] = grouped.get(x.id);
+            const totalRowsCount = filteredKarts.length;
 
             return [
                 <tr key={x.id}>
@@ -67,13 +68,15 @@ export default function KartsTablePit({
                         </td>
                     </tr>
                 ) : (
-                    filteredKarts.map((y) => (
+                    filteredKarts.map((y, i) => (
                         <KartsTableRowPit
                             key={y.id}
                             kart={y}
                             pits={pits}
                             eventNosInUse={eventNosInUse}
                             onEditConfirm={handleEditConfirm}
+                            rowIndex={i}
+                            totalRowsCount={totalRowsCount}
                         />
                     ))
                 )

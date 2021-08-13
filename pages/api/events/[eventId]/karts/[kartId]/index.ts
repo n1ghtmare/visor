@@ -40,8 +40,11 @@ async function handlePitOrderChangesIfNeeded(existingKart: Kart, requestKart: Ka
         await resetPitOrdersByPitId(requestKart.pitId);
     }
 
-    // If the kart was moved from one pit to another, then we have to reset the pit orders in the previous pit
-    if (existingKart.statusType === StatusType.Pit && requestKart.pitId !== existingKart.pitId) {
+    // If the kart was moved from one pit to another, or outside of a pit, then we have to reset the pit orders in the previous pit
+    if (
+        (requestKart.statusType !== StatusType.Pit && existingKart.statusType === StatusType.Pit) ||
+        (existingKart.statusType === StatusType.Pit && requestKart.pitId !== existingKart.pitId)
+    ) {
         await resetPitOrdersByPitId(existingKart.pitId);
     }
 }

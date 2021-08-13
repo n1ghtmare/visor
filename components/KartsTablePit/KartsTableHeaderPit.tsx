@@ -11,7 +11,7 @@ export default function KartsTableHeaderPit() {
                 <th className="w-40 px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
                     Classification
                 </th>
-                <th className="w-40 px-6 py-4 text-xs font-medium tracking-wider text-center text-gray-500 uppercase whitespace-nowrap">
+                <th className="w-40 px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap">
                     Pit Order
                 </th>
                 <th className="px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase whitespace-nowrap">

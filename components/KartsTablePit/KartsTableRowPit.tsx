@@ -13,17 +13,73 @@ import IdBadge from "components/Shared/IdBadge";
 
 import EditModalPit from "./KartsTableRowPit/EditModalPit";
 import MoveModalPit from "./KartsTableRowPit/MoveModalPit";
+import IconArrowSmDown from "components/Shared/IconArrowSmDown";
+import IconArrowSmUp from "components/Shared/IconArrowSmUp";
+
+function PitOrderBadge({
+    pitOrder,
+    index,
+    total
+}: {
+    pitOrder: number;
+    index: number;
+    total: number;
+}) {
+    function handleDownClick(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        console.log("will move kart down");
+    }
+
+    function handleUpClick(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        console.log("will move kart down");
+    }
+
+    return (
+        <div className="flex items-center justify-center">
+            <span>{pitOrder}</span>
+
+            <div className="flex flex-1">
+                {index !== total - 1 && (
+                    <Tooltip content="Move Kart down in the pit">
+                        <button
+                            className="p-1 text-blue-600 hover:text-blue-900"
+                            onClick={handleDownClick}
+                        >
+                            <IconArrowSmDown />
+                        </button>
+                    </Tooltip>
+                )}
+
+                {index !== 0 && (
+                    <Tooltip content="Move Kart up in the pit">
+                        <button
+                            className="p-2 text-blue-600 hover:text-blue-900"
+                            onClick={handleUpClick}
+                        >
+                            <IconArrowSmUp />
+                        </button>
+                    </Tooltip>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export default function KartsTableRowPit({
     kart,
     pits,
     onEditConfirm,
-    eventNosInUse
+    eventNosInUse,
+    rowIndex,
+    totalRowsCount
 }: {
     kart: Kart;
     pits: Pit[];
     onEditConfirm: (kart: Kart) => void;
     eventNosInUse: number[];
+    rowIndex: number;
+    totalRowsCount: number;
 }) {
     const [isMoving, setIsMoving] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -48,6 +104,8 @@ export default function KartsTableRowPit({
         setIsMoving(false);
         setIsEditing(false);
     }
+
+    console.log({ rowIndex }, { totalRowsCount });
 
     return (
         <>
@@ -78,7 +136,13 @@ export default function KartsTableRowPit({
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">{kart.pitOrder}</td>
+                <td className="px-6 py-4 text-center whitespace-nowrap">
+                    <PitOrderBadge
+                        pitOrder={kart.pitOrder}
+                        index={rowIndex}
+                        total={totalRowsCount}
+                    />
+                </td>
                 <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
                 <td className="font-medium text-right whitespace-nowrap">
                     <Tooltip content="Edit kart metadata" className="-mb-4">
