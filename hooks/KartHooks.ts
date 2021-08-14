@@ -5,15 +5,14 @@ import fetcher from "helpers/fetcher";
 import Kart from "entities/Kart";
 
 export function useKarts(eventId: number, currentUserId?: number) {
-    const { data, error, isValidating } = useSWR<Kart[]>(
-        eventId && currentUserId ? `/api/events/${eventId}/karts` : null,
-        fetcher
-    );
+    const url = eventId && currentUserId ? `/api/events/${eventId}/karts` : null;
+    const { data, error, isValidating, mutate } = useSWR<Kart[]>(url, fetcher);
 
     return {
         karts: data,
         isLoading: !error && !data,
         isError: error,
-        isValidating
+        isValidating,
+        mutate
     };
 }

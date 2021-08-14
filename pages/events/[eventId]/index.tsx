@@ -79,7 +79,8 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         karts,
         isLoading: isLoadingKarts,
         isError: isErrorKarts,
-        isValidating: isValidatingKarts
+        isValidating: isValidatingKarts,
+        mutate: mutateKarts
     } = useKarts(id, user?.id);
 
     const {
@@ -127,18 +128,12 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
             kart.pitOrder = maxPitOrder + 1;
         }
 
-        const kartsApiUrl = `/api/events/${id}/karts`;
-
-        mutate(
-            kartsApiUrl,
-            karts.map((x) => (x.id === kart.id ? kart : x)),
-            false
-        );
+        mutateKarts((data) => data.map((x) => (x.id === kart.id ? kart : x)), false);
 
         await updateKart(kart);
 
         // Mutate all karts from server (sync)
-        mutate(kartsApiUrl);
+        mutateKarts();
     }
 
     const grouped: Map<StatusType, Kart[]> = groupedMapByStatusType(karts);

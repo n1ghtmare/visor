@@ -5,66 +5,15 @@ import Tooltip from "@tippyjs/react";
 import Kart from "entities/Kart";
 import Pit from "entities/Pit";
 
-import ClassificationBadge from "components/Shared/ClassificationBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
 import IconSwitchHorizontal from "components/Shared/IconSwitchHorizontal";
 import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 import IdBadge from "components/Shared/IdBadge";
+import ClassificationBadge from "components/Shared/ClassificationBadge";
 
 import EditModalPit from "./KartsTableRowPit/EditModalPit";
 import MoveModalPit from "./KartsTableRowPit/MoveModalPit";
-import IconArrowSmDown from "components/Shared/IconArrowSmDown";
-import IconArrowSmUp from "components/Shared/IconArrowSmUp";
-
-function PitOrderBadge({
-    pitOrder,
-    index,
-    total
-}: {
-    pitOrder: number;
-    index: number;
-    total: number;
-}) {
-    function handleDownClick(e: React.MouseEvent<HTMLButtonElement>) {
-        e.preventDefault();
-        console.log("will move kart down");
-    }
-
-    function handleUpClick(e: React.MouseEvent<HTMLButtonElement>) {
-        e.preventDefault();
-        console.log("will move kart down");
-    }
-
-    return (
-        <div className="flex items-center justify-center">
-            <span>{pitOrder}</span>
-
-            <div className="flex flex-1">
-                {index !== total - 1 && (
-                    <Tooltip content="Move Kart down in the pit">
-                        <button
-                            className="p-1 text-blue-600 hover:text-blue-900"
-                            onClick={handleDownClick}
-                        >
-                            <IconArrowSmDown />
-                        </button>
-                    </Tooltip>
-                )}
-
-                {index !== 0 && (
-                    <Tooltip content="Move Kart up in the pit">
-                        <button
-                            className="p-2 text-blue-600 hover:text-blue-900"
-                            onClick={handleUpClick}
-                        >
-                            <IconArrowSmUp />
-                        </button>
-                    </Tooltip>
-                )}
-            </div>
-        </div>
-    );
-}
+import PitOrderControls from "./KartsTableRowPit/PitOrderControls";
 
 export default function KartsTableRowPit({
     kart,
@@ -105,7 +54,19 @@ export default function KartsTableRowPit({
         setIsEditing(false);
     }
 
-    console.log({ rowIndex }, { totalRowsCount });
+    function handleOrderUpClick() {
+        onEditConfirm({
+            ...kart,
+            pitOrder: rowIndex // rowIndex is zero based so it will move it 1 up in the UI order
+        });
+    }
+
+    function handleOrderDownClick() {
+        onEditConfirm({
+            ...kart,
+            pitOrder: rowIndex + 3
+        });
+    }
 
     return (
         <>
@@ -137,10 +98,12 @@ export default function KartsTableRowPit({
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
                 <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <PitOrderBadge
+                    <PitOrderControls
                         pitOrder={kart.pitOrder}
                         index={rowIndex}
                         total={totalRowsCount}
+                        onUpClick={handleOrderUpClick}
+                        onDownClick={handleOrderDownClick}
                     />
                 </td>
                 <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>

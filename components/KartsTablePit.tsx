@@ -11,10 +11,6 @@ import KartsTableHeaderPit from "./KartsTablePit/KartsTableHeaderPit";
 import KartsTableRowPit from "./KartsTablePit/KartsTableRowPit";
 import PitBadge from "./KartsTablePit/KartsTableRowPit/PitBadge";
 
-// TODO: Add a last status change date, so that the user can determine when a kart has entered the pit
-// TODO: Add separate tables for each pit
-// TODO: Add a "Pit No" that can be sorted and where pits can switch places
-// TODO: Add an option to switch pit orders for karts in pits (arrow buttons for up and down)
 export default function KartsTablePit({
     karts,
     pits,
@@ -26,12 +22,6 @@ export default function KartsTablePit({
     eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
 }) {
-    function handleEditConfirm(kart: Kart) {
-        //TODO: Handle re-ordering here
-
-        onEditConfirm(kart);
-    }
-
     function renderTableInnerBody() {
         if (karts.length === 0) {
             return (
@@ -50,14 +40,14 @@ export default function KartsTablePit({
 
         return pits.map((x) => {
             const filteredKarts: Kart[] = grouped.get(x.id);
-            const totalRowsCount = filteredKarts.length;
+            const totalRowsCount = filteredKarts ? filteredKarts.length : 0;
 
             return [
                 <tr key={x.id}>
                     <td colSpan={7} className="px-6 py-3 bg-gray-50">
                         <div className="flex items-center space-x-4">
                             <PitBadge name={x.name} colorHex={x.colorHex} />
-                            <span className="font-bold text-gray-500"> {filteredKarts.length}</span>
+                            <span className="font-bold text-gray-500">{totalRowsCount}</span>
                         </div>
                     </td>
                 </tr>,
@@ -74,7 +64,7 @@ export default function KartsTablePit({
                             kart={y}
                             pits={pits}
                             eventNosInUse={eventNosInUse}
-                            onEditConfirm={handleEditConfirm}
+                            onEditConfirm={onEditConfirm}
                             rowIndex={i}
                             totalRowsCount={totalRowsCount}
                         />
