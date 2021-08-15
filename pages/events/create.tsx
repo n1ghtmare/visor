@@ -49,11 +49,11 @@ async function createEvent(data: CreateFormInputs): Promise<PostEventResponseDat
 
 // TODO: Get better default colors from the users
 const DEFAULT_PIT_COLORS_MAP = {
-    0: "#00ffc2",
-    1: "#00ff0a",
-    2: "#0040ff",
-    3: "#e300ff",
-    4: "#e01b1b"
+    0: "#EF4444",
+    1: "#10B981",
+    2: "#FCD34D",
+    3: "#3B82F6",
+    4: "#8B5CF6"
 };
 
 export default function Create() {

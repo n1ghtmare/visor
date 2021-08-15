@@ -1,6 +1,5 @@
 import { NextApiResponse } from "next";
 
-import sleep from "helpers/sleep";
 import withSession, { NextIronRequest } from "helpers/session";
 import { validateRequestAndGetEvent } from "helpers/api";
 import {
@@ -50,10 +49,6 @@ async function handlePitOrderChangesIfNeeded(existingKart: Kart, requestKart: Ka
 }
 
 async function handlePut(req: NextIronRequest, res: NextApiResponse) {
-    // TODO: Remove before production
-    // simulate long working hours
-    await sleep(3000);
-
     const event: Event = await validateRequestAndGetEvent(req, res);
 
     const { kartId } = req.query;

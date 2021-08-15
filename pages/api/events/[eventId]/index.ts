@@ -2,16 +2,11 @@ import { NextApiResponse } from "next";
 
 import { deleteEvent } from "database/repository";
 import { validateRequestAndGetEvent } from "helpers/api";
-import sleep from "helpers/sleep";
 
 import Event from "entities/Event";
 import withSession, { NextIronRequest } from "helpers/session";
 
 async function handleDelete(req: NextIronRequest, res: NextApiResponse) {
-    // TODO: Remove before production
-    // simulate long working hours
-    await sleep(3000);
-
     const event: Event = await validateRequestAndGetEvent(req, res);
     await deleteEvent(event.id);
 
@@ -19,10 +14,6 @@ async function handleDelete(req: NextIronRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextIronRequest, res: NextApiResponse) {
-    // TODO: Remove before production
-    // simulate long working hours
-    await sleep(3000);
-
     const event: Event = await validateRequestAndGetEvent(req, res);
 
     res.status(200).json(event);

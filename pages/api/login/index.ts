@@ -6,7 +6,6 @@ import { getUserByUsername } from "database/repository";
 
 import UserComposite from "entities/UserComposite";
 import User from "entities/User";
-import sleep from "helpers/sleep";
 
 type LoginRequestData = {
     username: string;
@@ -19,8 +18,6 @@ export default withSession(
             res.status(405).json({ message: "Method not allowed" });
             return;
         }
-
-        await sleep(2000);
 
         // dev password: log me into visor | $2a$12$6w09Cc7qFJPykqtHYdQ1qeuZPxJdvYCWRHYE.joJWCdg/WdErWSP2
         const { username, password } = (await req.body) as LoginRequestData;

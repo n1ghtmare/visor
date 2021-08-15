@@ -10,10 +10,6 @@ import PostEventResponseData from "entities/PostEventResponseData";
 import UserComposite from "entities/UserComposite";
 import PitColorMap from "entities/PitColorMap";
 
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 type PostRequestData = {
     name: string;
     noOfTotalKarts: number;
