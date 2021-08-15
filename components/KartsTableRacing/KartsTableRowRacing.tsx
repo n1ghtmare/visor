@@ -7,13 +7,14 @@ import Pit from "entities/Pit";
 
 import ClassificationBadge from "components/Shared/ClassificationBadge";
 import EventNoBadge from "components/Shared/EventNoBadge";
+import IdBadge from "components/Shared/IdBadge";
+import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
 import IconSwitchHorizontal from "components/Shared/IconSwitchHorizontal";
-import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
+import MarkdownDisplay from "components/Shared/MarkdownDisplay";
 
 import EditModalRacing from "./KartsTableRowRacing/EditModalRacing";
 import MoveModalRacing from "./KartsTableRowRacing/MoveModalRacing";
-import IdBadge from "components/Shared/IdBadge";
 
 export default function KartsTableRowRacing({
     kart,
@@ -82,7 +83,9 @@ export default function KartsTableRowRacing({
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
-                <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
+                <td className="px-6 py-4 text-left">
+                    {kart.markdownNotes ? <MarkdownDisplay content={kart.markdownNotes} /> : "-"}
+                </td>
                 <td className="font-medium text-center whitespace-nowrap">
                     <Tooltip content="Edit kart metadata" className="-mb-4">
                         <button

@@ -10,6 +10,7 @@ import IconPencilAlt from "components/Shared/IconPencilAlt";
 import IconSwitchHorizontal from "components/Shared/IconSwitchHorizontal";
 import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 import IdBadge from "components/Shared/IdBadge";
+import MarkdownDisplay from "components/Shared/MarkdownDisplay";
 
 import EditModalIdle from "./KartsTableRowIdle/EditModalIdle";
 import MoveModalIdle from "./KartsTableRowIdle/MoveModalIdle";
@@ -79,7 +80,9 @@ export default function KartsTableRowIdle({
                 <td className="px-6 py-4 text-center whitespace-nowrap">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
-                <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
+                <td className="px-6 py-4 text-left">
+                    {kart.markdownNotes ? <MarkdownDisplay content={kart.markdownNotes} /> : "-"}
+                </td>
                 <td className="font-medium text-center whitespace-nowrap">
                     <Tooltip content="Edit kart metadata" className="-mb-4">
                         <button

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 import Tooltip from "@tippyjs/react";
 
@@ -14,6 +15,7 @@ import ClassificationBadge from "components/Shared/ClassificationBadge";
 import EditModalPit from "./KartsTableRowPit/EditModalPit";
 import MoveModalPit from "./KartsTableRowPit/MoveModalPit";
 import PitOrderControls from "./KartsTableRowPit/PitOrderControls";
+import MarkdownDisplay from "components/Shared/MarkdownDisplay";
 
 export default function KartsTableRowPit({
     kart,
@@ -106,7 +108,9 @@ export default function KartsTableRowPit({
                         onDownClick={handleOrderDownClick}
                     />
                 </td>
-                <td className="px-6 py-4 text-left">{kart.markdownNotes || "-"}</td>
+                <td className="px-6 py-4 text-left">
+                    {kart.markdownNotes ? <MarkdownDisplay content={kart.markdownNotes} /> : "-"}
+                </td>
                 <td className="font-medium text-right whitespace-nowrap">
                     <Tooltip content="Edit kart metadata" className="-mb-4">
                         <button
