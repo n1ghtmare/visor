@@ -9,6 +9,7 @@ export function parseDateFromServer(date: string): Date {
 }
 
 export function generateTimestampText(date: Date) {
+    console.log({ date });
     if (typeof date === "string") {
         date = parseDateFromServer(date);
     }

@@ -34,6 +34,7 @@ async function setInitialPitOrderToKartIfNeeded(existingKart: Kart, requestKart:
 }
 
 async function handlePitOrderChangesIfNeeded(existingKart: Kart, requestKart: Kart) {
+    console.log({ requestKart });
     // If the kart pitOrder doesn't have a fraction that means it was changed by the user
     if (requestKart.pitOrder % 1.0 === 0) {
         await resetPitOrdersByPitId(requestKart.pitId);
@@ -44,6 +45,7 @@ async function handlePitOrderChangesIfNeeded(existingKart: Kart, requestKart: Ka
         (requestKart.statusType !== StatusType.Pit && existingKart.statusType === StatusType.Pit) ||
         (existingKart.statusType === StatusType.Pit && requestKart.pitId !== existingKart.pitId)
     ) {
+        console.log({ existingKart });
         await resetPitOrdersByPitId(existingKart.pitId);
     }
 }
