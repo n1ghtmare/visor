@@ -5,7 +5,12 @@ types.setTypeParser(types.builtins.NUMERIC, function (value: string) {
     return parseFloat(value);
 });
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: true });
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === "production" && {
+        rejectUnauthorized: false
+    }
+});
 
 export default async function query<T>(input: string | QueryConfig, params?: any[]) {
     return pool.query<T>(input, params);
