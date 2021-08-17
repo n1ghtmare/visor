@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "npm run migrate-dev && next dev",
         "build": "npm run migrate-prod && next build",
-        "start": "next start",
+        "start": "next start -p $PORT",
         "lint": "next lint",
         "migrate-prod": "node-pg-migrate up --tsconfig ./tsconfig.json --envPath ./.env.production -t migrations --rejectUnauthorized false",
         "migrate-dev": "node-pg-migrate up --tsconfig ./tsconfig.json --envPath ./.env.development -t migrations"
