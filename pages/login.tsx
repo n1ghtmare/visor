@@ -73,7 +73,7 @@ export default function Login() {
     return (
         <Layout pageTitle="Visor - Login" shouldDisplayHeader={false}>
             <div className="flex flex-col items-center">
-                <main role="main" className="w-1/3">
+                <main role="main" className="w-full md:w-96">
                     <h1 className="text-4xl font-bold tracking-tight">Login</h1>
 
                     <form

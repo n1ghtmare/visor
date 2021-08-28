@@ -19,7 +19,7 @@ export default function Layout({
             {shouldDisplayHeader && <Header />}
 
             <div className="flex flex-col items-center ">
-                <div className="py-20 lg:mx-auto lg:w-9/12">{children}</div>
+                <div className="py-20 w-full px-8 lg:px-0 lg:mx-auto lg:w-9/12">{children}</div>
             </div>
         </>
     );
