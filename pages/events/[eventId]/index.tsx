@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { GetServerSidePropsContext } from "next";
-import { mutate } from "swr";
 
 import { useKarts } from "hooks/KartHooks";
 import { useEvent } from "hooks/EventHooks";
 import { usePits } from "hooks/PitHooks";
 import { useUser } from "hooks/UserHooks";
-import { groupedMapByPitId, groupedMapByStatusType } from "helpers/data";
+import { groupedMapByStatusType } from "helpers/data";
 
 import StatusType from "entities/StatusType";
 import Kart from "entities/Kart";
@@ -67,6 +66,22 @@ async function updateKart(kart: Kart): Promise<void> {
     await response.json();
 }
 
+async function deleteKart(kart: Kart): Promise<void> {
+    const response = await fetch(`/api/events/${kart.eventId}/karts/${kart.id}`, {
+        method: "DELETE",
+        body: JSON.stringify(kart),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(response.status.toString());
+    }
+
+    await response.json();
+}
+
 export default function EventDetails({ id, status }: { id: number; status?: string }) {
     const [statusType, setStatusType] = useState<StatusType>(StatusType.Racing);
     const { user } = useUser({ redirectTo: "/login" });
@@ -110,6 +125,15 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
         );
     }
 
+    async function handleDeleteConfirm(kart: Kart) {
+        mutateKarts((data) => data.filter((x) => x.id !== kart.id), false);
+
+        await deleteKart(kart);
+
+        // Mutate all karts from the server (sync)
+        mutateKarts();
+    }
+
     async function handleEditConfirm(kart: Kart) {
         const existingKart = karts.filter((x) => x.id === kart.id)[0];
 
@@ -147,6 +171,7 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
                     karts={filteredKarts}
                     pits={pits}
                     onEditConfirm={handleEditConfirm}
+                    onDeleteConfirm={handleDeleteConfirm}
                 />
             );
         }
@@ -159,6 +184,7 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
                     karts={filteredKarts}
                     pits={pits}
                     onEditConfirm={handleEditConfirm}
+                    onDeleteConfirm={handleDeleteConfirm}
                     eventNosInUse={eventNosInUse}
                 />
             );
@@ -169,6 +195,7 @@ export default function EventDetails({ id, status }: { id: number; status?: stri
                 karts={filteredKarts}
                 pits={pits}
                 onEditConfirm={handleEditConfirm}
+                onDeleteConfirm={handleDeleteConfirm}
                 eventNosInUse={eventNosInUse}
             />
         );

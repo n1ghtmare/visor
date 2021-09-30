@@ -8,7 +8,7 @@ import IconBan from "components/Shared/IconBan";
 import IconExclamationCircle from "components/Shared/IconExclamationCircle";
 import Modal from "components/Shared/Modal";
 
-export default function DeleteModal(props: {
+export default function DeleteEventModal(props: {
     eventName: string;
     onCancel: () => void;
     onSubmit: () => void;

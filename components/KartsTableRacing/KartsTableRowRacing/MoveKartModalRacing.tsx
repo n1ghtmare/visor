@@ -11,11 +11,10 @@ import ButtonOutline from "components/Shared/ButtonOutline";
 import IconBan from "components/Shared/IconBan";
 import IconPlay from "components/Shared/IconPlay";
 import IconStop from "components/Shared/IconStop";
-import LoadingIndicatorFlat from "components/Shared/LoadingIndicatorFlat";
 import Modal from "components/Shared/Modal";
 import Radio from "components/Shared/Radio";
 
-export default function MoveModalRacing({
+export default function MoveKartModalRacing({
     kart,
     pits,
     onCancel,

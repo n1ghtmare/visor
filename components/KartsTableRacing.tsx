@@ -11,11 +11,13 @@ import KartsTableRowRacing from "./KartsTableRacing/KartsTableRowRacing";
 export default function KartsTableRacing({
     karts,
     pits,
-    onEditConfirm
+    onEditConfirm,
+    onDeleteConfirm
 }: {
     karts: Kart[];
     pits: Pit[];
     onEditConfirm: (kart: Kart) => void;
+    onDeleteConfirm: (kart: Kart) => void;
 }) {
     return (
         <KartsTable>
@@ -23,7 +25,7 @@ export default function KartsTableRacing({
             <KartsTableBody>
                 {karts.length === 0 ? (
                     <KartsTableEmptyRow
-                        colSpan={7}
+                        colSpan={8}
                         message="No karts are racing right now. When you move a kart from either a pit or from being idle, it should appear here."
                     />
                 ) : (
@@ -33,6 +35,7 @@ export default function KartsTableRacing({
                             pits={pits}
                             kart={x}
                             onEditConfirm={onEditConfirm}
+                            onDeleteConfirm={onDeleteConfirm}
                         />
                     ))
                 )}

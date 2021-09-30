@@ -5,15 +5,15 @@ import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 import ClassificationType from "entities/ClassificationType";
 import Kart from "entities/Kart";
 
+import Modal from "components/Shared/Modal";
 import Button from "components/Shared/Button";
 import ButtonOutline from "components/Shared/ButtonOutline";
 import IconBan from "components/Shared/IconBan";
 import IconPlay from "components/Shared/IconPlay";
 import Radio from "components/Shared/Radio";
 import TextArea from "components/Shared/TextArea";
-import Modal from "components/Shared/Modal";
 
-export default function EditModalPit({
+export default function EditKartModal({
     kart,
     onCancel,
     onSubmit
@@ -59,8 +59,8 @@ export default function EditModalPit({
                     </p>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="mt-6 space-y-4">
+                <div className="mt-6 space-y-6">
+                    <div className="space-y-4">
                         <div className="flex px-4 py-2 border rounded">
                             <Radio
                                 value={ClassificationType.SlowAF.toString()}
@@ -126,6 +126,7 @@ export default function EditModalPit({
                         />
                     </div>
                 </div>
+
                 <div className="mt-6 sm:flex sm:flex-row-reverse sm:space-x-2 sm:space-x-reverse">
                     <span className="flex w-full sm:w-auto">
                         <Button type="submit">
@@ -133,7 +134,7 @@ export default function EditModalPit({
                             <span>Continue</span>
                         </Button>
                     </span>
-                    <span className="flex w-full mt-2 sm:mt-0 sm:w-auto">
+                    <span className="flex w-full mt-4 sm:mt-0 sm:w-auto">
                         <ButtonOutline type="reset" onClick={handleCancelClick}>
                             <IconBan />
                             <span>Cancel</span>

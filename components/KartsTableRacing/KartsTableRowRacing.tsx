@@ -12,21 +12,26 @@ import PreviousEventNoBadge from "components/Shared/PreviousEventNoBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
 import IconSwitchHorizontal from "components/Shared/IconSwitchHorizontal";
 import MarkdownDisplay from "components/Shared/MarkdownDisplay";
+import EditKartModal from "components/Shared/EditKartModal";
+import IconTrash from "components/Shared/IconTrash";
+import DeleteKartModal from "components/Shared/DeleteKartModal";
 
-import EditModalRacing from "./KartsTableRowRacing/EditModalRacing";
-import MoveModalRacing from "./KartsTableRowRacing/MoveModalRacing";
+import MoveKartModalRacing from "./KartsTableRowRacing/MoveKartModalRacing";
 
 export default function KartsTableRowRacing({
     kart,
     pits,
-    onEditConfirm
+    onEditConfirm,
+    onDeleteConfirm
 }: {
     kart: Kart;
     pits: Pit[];
     onEditConfirm: (kart: Kart) => void;
+    onDeleteConfirm: (kart: Kart) => void;
 }) {
     const [isMoving, setIsMoving] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
     function handleMoveClick(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
@@ -38,21 +43,35 @@ export default function KartsTableRowRacing({
         setIsEditing(true);
     }
 
+    function handleDeleteClick(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        setIsDeleting(true);
+    }
+
     function handleModalCancelClick() {
-        setIsMoving(false);
-        setIsEditing(false);
+        closeAllModals();
     }
 
     function handleSubmit(kart: Kart) {
         onEditConfirm(kart);
+        closeAllModals();
+    }
+
+    function handleDelete() {
+        onDeleteConfirm(kart);
+        closeAllModals();
+    }
+
+    function closeAllModals() {
         setIsMoving(false);
         setIsEditing(false);
+        setIsDeleting(false);
     }
 
     return (
         <>
             {isMoving && (
-                <MoveModalRacing
+                <MoveKartModalRacing
                     key="move-modal-racing"
                     pits={pits}
                     kart={kart}
@@ -62,10 +81,19 @@ export default function KartsTableRowRacing({
             )}
 
             {isEditing && (
-                <EditModalRacing
+                <EditKartModal
                     key="edit-modal-racing"
                     kart={kart}
                     onSubmit={handleSubmit}
+                    onCancel={handleModalCancelClick}
+                />
+            )}
+
+            {isDeleting && (
+                <DeleteKartModal
+                    key="delete-modal-racing"
+                    kart={kart}
+                    onSubmit={handleDelete}
                     onCancel={handleModalCancelClick}
                 />
             )}
@@ -85,6 +113,16 @@ export default function KartsTableRowRacing({
                 </td>
                 <td className="px-6 py-4 text-left">
                     {kart.markdownNotes ? <MarkdownDisplay content={kart.markdownNotes} /> : "-"}
+                </td>
+                <td className="font-medium text-center whitespace-nowrap">
+                    <Tooltip content="Delete kart" className="-mb-4">
+                        <button
+                            className="p-5 text-red-600 hover:text-red-900"
+                            onClick={handleDeleteClick}
+                        >
+                            <IconTrash />
+                        </button>
+                    </Tooltip>
                 </td>
                 <td className="font-medium text-center whitespace-nowrap">
                     <Tooltip content="Edit kart metadata" className="-mb-4">

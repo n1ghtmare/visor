@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
 import Kart from "entities/Kart";
+import Pit from "entities/Pit";
 import StatusType from "entities/StatusType";
 
 import AvailableEventNosNotice from "components/Shared/AvailableEventNosNotice";
@@ -12,12 +13,10 @@ import IconBan from "components/Shared/IconBan";
 import IconFlag from "components/Shared/IconFlag";
 import IconPlay from "components/Shared/IconPlay";
 import Input from "components/Shared/Input";
-import LoadingIndicatorFlat from "components/Shared/LoadingIndicatorFlat";
 import Modal from "components/Shared/Modal";
 import Radio from "components/Shared/Radio";
-import Pit from "entities/Pit";
 
-export default function MoveModalIdle({
+export default function MoveKartModalIdle({
     kart,
     pits,
     onCancel,

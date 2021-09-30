@@ -18,6 +18,9 @@ export default function KartsTableHeaderRacing() {
                     Notes
                 </th>
                 <th className="w-20">
+                    <span className="sr-only">Delete</span>
+                </th>
+                <th className="w-20">
                     <span className="sr-only">Edit</span>
                 </th>
                 <th className="w-20">

@@ -6,7 +6,8 @@ import {
     getKart,
     getMaxPitOrderIdByPitId,
     resetPitOrdersByPitId,
-    updateKart
+    updateKart,
+    deleteKart
 } from "database/repository";
 
 import Event from "entities/Event";
@@ -48,7 +49,10 @@ async function handlePitOrderChangesIfNeeded(existingKart: Kart, requestKart: Ka
     }
 }
 
-async function handlePut(req: NextIronRequest, res: NextApiResponse) {
+async function validateRequestAndGetKart(
+    req: NextIronRequest,
+    res: NextApiResponse
+): Promise<Kart> {
     const event: Event = await validateRequestAndGetEvent(req, res);
 
     const { kartId } = req.query;
@@ -57,27 +61,49 @@ async function handlePut(req: NextIronRequest, res: NextApiResponse) {
     // Validate the kart as well - we can't call a kart that doesn't belong to the event (missmatch)
     if (kart.eventId !== event.id) {
         res.status(403).json({ message: "Forbidden" });
+        return;
     }
 
     const requestKart = req.body as Kart;
 
-    if (kart.id === requestKart.id) {
-        // Assign a new pit order only for karts that are placed in the pit from another status
-        await setInitialPitOrderToKartIfNeeded(kart, requestKart);
-        await updateKart(requestKart);
-
-        // Make sure all karts are in the correct pit order
-        await handlePitOrderChangesIfNeeded(kart, requestKart);
+    if (kart.id !== requestKart.id) {
+        res.status(400).json({ message: "Bad Request" });
+        return;
     }
 
-    res.status(200).json({ message: `Success updating kart with id: ${event.id}` });
+    return kart;
+}
+
+async function handlePut(req: NextIronRequest, res: NextApiResponse) {
+    const kart: Kart = await validateRequestAndGetKart(req, res);
+    const requestKart = req.body as Kart;
+
+    // Assign a new pit order only for karts that are placed in the pit from another status
+    await setInitialPitOrderToKartIfNeeded(kart, requestKart);
+    await updateKart(requestKart);
+
+    // Make sure all karts are in the correct pit order
+    await handlePitOrderChangesIfNeeded(kart, requestKart);
+
+    res.status(200).json({ message: `Success updating kart with id: ${kart.id}` });
+}
+
+async function handleDelete(req: NextIronRequest, res: NextApiResponse) {
+    const kart: Kart = await validateRequestAndGetKart(req, res);
+
+    await deleteKart(kart);
+
+    res.status(200).json({ message: `Success deleteing kart with id: ${kart.id}` });
 }
 
 export default withSession(async function handler(req: NextIronRequest, res: NextApiResponse) {
     // DELETE: api/events/[id]/karts/[id]
     if (req.method === "PUT") {
         await handlePut(req, res);
+    } else if (req.method === "DELETE") {
+        await handleDelete(req, res);
     }
+
     // no other request types are allowed
     else {
         res.status(405).json({ message: "Method not allowed" });

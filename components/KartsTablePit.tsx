@@ -15,12 +15,14 @@ export default function KartsTablePit({
     karts,
     pits,
     eventNosInUse,
-    onEditConfirm
+    onEditConfirm,
+    onDeleteConfirm
 }: {
     karts: Kart[];
     pits: Pit[];
     eventNosInUse: number[];
     onEditConfirm: (kart: Kart) => void;
+    onDeleteConfirm: (kart: Kart) => void;
 }) {
     function renderTableInnerBody() {
         if (karts.length === 0) {
@@ -44,7 +46,7 @@ export default function KartsTablePit({
 
             return [
                 <tr key={x.id}>
-                    <td colSpan={7} className="px-6 py-3 bg-gray-50">
+                    <td colSpan={8} className="px-6 py-3 bg-gray-50">
                         <div className="flex items-center space-x-4">
                             <PitBadge name={x.name} colorHex={x.colorHex} />
                             <span className="font-bold text-gray-500">{totalRowsCount}</span>
@@ -53,7 +55,7 @@ export default function KartsTablePit({
                 </tr>,
                 !filteredKarts ? (
                     <tr key={`no-karts-${x.id}`}>
-                        <td colSpan={7} className="px-6 py-2">
+                        <td colSpan={8} className="px-6 py-2">
                             -
                         </td>
                     </tr>
@@ -65,6 +67,7 @@ export default function KartsTablePit({
                             pits={pits}
                             eventNosInUse={eventNosInUse}
                             onEditConfirm={onEditConfirm}
+                            onDeleteConfirm={onDeleteConfirm}
                             rowIndex={i}
                             totalRowsCount={totalRowsCount}
                         />

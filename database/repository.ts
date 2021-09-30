@@ -207,6 +207,10 @@ export async function updateKart(kart: Kart): Promise<void> {
     );
 }
 
+export async function deleteKart(kart: Kart): Promise<void> {
+    await query(`DELETE FROM karts WHERE id = $1`, [kart.id]);
+}
+
 export async function getMaxPitOrderIdByPitId(pitId: string): Promise<number> {
     const result = await query<{ maxPitOrder: number }>(
         `SELECT
