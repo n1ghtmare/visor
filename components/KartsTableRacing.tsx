@@ -1,5 +1,4 @@
-import Kart from "entities/Kart";
-import Pit from "entities/Pit";
+import { Kart, Pit } from "@prisma/client";
 
 import KartsTable from "./Shared/KartsTable";
 import KartsTableBody from "./Shared/KartsTableBody";

@@ -1,4 +1,4 @@
-import Kart from "entities/Kart";
+import { Kart } from "@prisma/client";
 import StatusType from "entities/StatusType";
 
 export function groupedMapByStatusType(karts: Kart[]): Map<StatusType, Kart[]> {

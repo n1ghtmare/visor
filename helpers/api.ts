@@ -3,7 +3,7 @@ import { NextApiResponse } from "next";
 import { NextIronRequest } from "./session";
 import { getEvent } from "database/repository";
 
-import Event from "entities/Event";
+import { Event } from "@prisma/client";
 import UserComposite from "entities/UserComposite";
 
 // TODO: needs to be removed and we need to get it from the session

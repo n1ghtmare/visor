@@ -5,12 +5,29 @@ import withSession, { NextIronRequest } from "helpers/session";
 import { getUserByUsername } from "database/repository";
 
 import UserComposite from "entities/UserComposite";
-import User from "entities/User";
+import { User } from "@prisma/client";
 
 type LoginRequestData = {
     username: string;
     password: string;
 };
+
+// TODO: Remove these credentials from here -> they're here just for testing purposes (so that the user doesn't create a default account)
+async function ensureDevAdminAccount_REMOVE_ME() {
+    const user: User = await prisma.user.findUnique({
+        where: { username: "admin" }
+    });
+
+    if (!user) {
+        await prisma.user.create({
+            data: {
+                username: "admin",
+                password: "$2a$12$6w09Cc7qFJPykqtHYdQ1qeuZPxJdvYCWRHYE.joJWCdg/WdErWSP2", // log me into visor
+                displayName: "Administrator"
+            }
+        });
+    }
+}
 
 export default withSession(
     async (req: NextIronRequest, res: NextApiResponse<UserComposite | { message?: string }>) => {
@@ -18,6 +35,8 @@ export default withSession(
             res.status(405).json({ message: "Method not allowed" });
             return;
         }
+
+        await ensureDevAdminAccount_REMOVE_ME();
 
         // dev password: log me into visor | $2a$12$6w09Cc7qFJPykqtHYdQ1qeuZPxJdvYCWRHYE.joJWCdg/WdErWSP2
         const { username, password } = (await req.body) as LoginRequestData;

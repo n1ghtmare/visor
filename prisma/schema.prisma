@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int    @id @default(autoincrement())
+  username    String @unique
+  displayName String @map(name: "display_name")
+  password    String
+
+  events Event[]
+
+  @@map(name: "users")
+}
+
+model Event {
+  id              Int      @id @default(autoincrement())
+  name            String
+  createdBy       User     @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  createdByUserId Int      @map(name: "created_by_user_id")
+  createdOnDate   DateTime @default(now()) @map(name: "created_on_date")
+
+  pits  Pit[]
+  karts Kart[]
+
+  @@map(name: "events")
+}
+
+model Pit {
+  id          String  @id @default(cuid())
+  eventId     Int     @map(name: "event_id")
+  event       Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name        String
+  colorHex    String  @map(name: "color_hex")
+  description String?
+
+  @@map(name: "pits")
+}
+
+model Kart {
+  id                 String  @id @default(cuid())
+  eventId            Int     @map(name: "event_id")
+  event              Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  statusType         Int     @map(name: "status_type")
+  eventNo            Int?    @map(name: "event_no")
+  previousEventNo    Int?    @map(name: "previous_event_no")
+  classificationType Int     @map(name: "classification_type")
+  pitId              String? @map(name: "pit_id")
+  pitOrder           Float?  @map(name: "pit_order")
+  markdownNotes      String? @map(name: "markdown_notes")
+  pitName            String? @map(name: "pit_name")
+  pitColorHex        String? @map(name: "pit_color_hex")
+
+  @@map("karts")
+}

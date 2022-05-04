@@ -11,7 +11,6 @@ import PitColorMap from "entities/PitColorMap";
 import PostEventResponseData from "entities/PostEventResponseData";
 import EventComposite from "entities/EventComposite";
 import StatusType from "entities/StatusType";
-import Kart from "entities/Kart";
 
 import Button from "components/Shared/Button";
 import Input from "components/Shared/Input";
@@ -20,6 +19,7 @@ import LoadingIndicator from "components/Shared/LoadingIndicator";
 import Layout from "components/Shared/Layout";
 
 import PitColorPicker from "components/EventCreate/PitColorPicker";
+import { Kart } from "@prisma/client";
 
 type CreateFormInputs = {
     name: string;
@@ -153,12 +153,12 @@ export default function Create() {
                     <div className="translate-x-0 translate-y-0">
                         <form
                             onSubmit={handleSubmit(onSubmit)}
-                            className="mt-16 overflow-hidden bg-white border border-gray-300 rounded-lg shadow divide-y divide-gray-200"
+                            className="mt-16 divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-300 bg-white shadow"
                         >
                             <div className="px-6 py-3">
                                 <div className="mt-4">
                                     <div className="flex items-baseline">
-                                        <label className="flex-1 mb-2 font-bold" htmlFor="name">
+                                        <label className="mb-2 flex-1 font-bold" htmlFor="name">
                                             What&apos;s the name of the event?
                                         </label>
 
@@ -183,7 +183,7 @@ export default function Create() {
                                 <div className="mt-4">
                                     <div className="flex items-baseline">
                                         <label
-                                            className="flex-1 mb-2 font-bold"
+                                            className="mb-2 flex-1 font-bold"
                                             htmlFor="noOfTotalKarts"
                                         >
                                             How many karts in total?
@@ -216,7 +216,7 @@ export default function Create() {
                                 <div className="mt-4">
                                     <div className="flex items-baseline">
                                         <label
-                                            className="flex-1 mb-2 font-bold"
+                                            className="mb-2 flex-1 font-bold"
                                             htmlFor="noOfStartingKarts"
                                         >
                                             How many karts are starting?
@@ -253,7 +253,7 @@ export default function Create() {
 
                                 <div className="mt-4">
                                     <div className="flex items-baseline">
-                                        <label className="flex-1 mb-2 font-bold" htmlFor="noOfPits">
+                                        <label className="mb-2 flex-1 font-bold" htmlFor="noOfPits">
                                             How many pit lanes?
                                         </label>
 
@@ -296,7 +296,7 @@ export default function Create() {
                                     </div>
                                 )}
                             </div>
-                            <div className="px-6 py-3 mt-4 bg-gray-50">
+                            <div className="mt-4 bg-gray-50 px-6 py-3">
                                 <Button type="submit" isDisabled={isLoading}>
                                     <IconPlay />
                                     {isLoading ? (

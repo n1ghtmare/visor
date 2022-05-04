@@ -1,8 +1,7 @@
 import useSWR from "swr";
 
 import fetcher from "helpers/fetcher";
-
-import Kart from "entities/Kart";
+import { Kart } from "@prisma/client";
 
 export function useKarts(eventId: number, currentUserId?: number) {
     const url = eventId && currentUserId ? `/api/events/${eventId}/karts` : null;

@@ -7,8 +7,8 @@ import { usePits } from "hooks/PitHooks";
 import { useUser } from "hooks/UserHooks";
 import { groupedMapByStatusType } from "helpers/data";
 
+import { Kart } from "@prisma/client";
 import StatusType from "entities/StatusType";
-import Kart from "entities/Kart";
 
 import LoadingIndicator from "components/Shared/LoadingIndicator";
 import RefetchingIndicator from "components/Shared/RefetchingIndicator";

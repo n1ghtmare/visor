@@ -2,8 +2,7 @@ import React, { useState } from "react";
 
 import Tooltip from "@tippyjs/react";
 
-import Kart from "entities/Kart";
-import Pit from "entities/Pit";
+import { Kart, Pit } from "@prisma/client";
 
 import ClassificationBadge from "components/Shared/ClassificationBadge";
 import IconPencilAlt from "components/Shared/IconPencilAlt";
@@ -102,20 +101,20 @@ export default function KartsTableRowIdle({
                 />
             )}
 
-            <tr className="hover:bg-blue-50 hover:cursor-pointer">
-                <td className="px-6 py-3 font-medium text-left">
+            <tr className="hover:cursor-pointer hover:bg-blue-50">
+                <td className="px-6 py-3 text-left font-medium">
                     <IdBadge id={kart.id} />
                 </td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">
+                <td className="whitespace-nowrap px-6 py-4 text-center">
                     <PreviousEventNoBadge value={kart.previousEventNo} />
                 </td>
-                <td className="px-6 py-4 text-center whitespace-nowrap">
+                <td className="whitespace-nowrap px-6 py-4 text-center">
                     <ClassificationBadge value={kart.classificationType} />
                 </td>
                 <td className="px-6 py-4 text-left">
                     {kart.markdownNotes ? <MarkdownDisplay content={kart.markdownNotes} /> : "-"}
                 </td>
-                <td className="font-medium text-center whitespace-nowrap">
+                <td className="whitespace-nowrap text-center font-medium">
                     <Tooltip content="Delete kart" className="-mb-4">
                         <button
                             className="p-5 text-red-600 hover:text-red-900"
@@ -125,7 +124,7 @@ export default function KartsTableRowIdle({
                         </button>
                     </Tooltip>
                 </td>
-                <td className="font-medium text-center whitespace-nowrap">
+                <td className="whitespace-nowrap text-center font-medium">
                     <Tooltip content="Edit kart metadata" className="-mb-4">
                         <button
                             className="p-5 text-blue-600 hover:text-blue-900"
@@ -135,7 +134,7 @@ export default function KartsTableRowIdle({
                         </button>
                     </Tooltip>
                 </td>
-                <td className="font-medium text-center whitespace-nowrap">
+                <td className="whitespace-nowrap text-center font-medium">
                     <Tooltip content="Move kart / change status" className="-mb-4">
                         <button
                             className="p-5 text-blue-600 hover:text-blue-900"

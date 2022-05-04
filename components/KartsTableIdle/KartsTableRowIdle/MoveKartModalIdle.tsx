@@ -2,8 +2,6 @@ import React, { useState, useRef } from "react";
 
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
-import Kart from "entities/Kart";
-import Pit from "entities/Pit";
 import StatusType from "entities/StatusType";
 
 import AvailableEventNosNotice from "components/Shared/AvailableEventNosNotice";
@@ -15,6 +13,7 @@ import IconPlay from "components/Shared/IconPlay";
 import Input from "components/Shared/Input";
 import Modal from "components/Shared/Modal";
 import Radio from "components/Shared/Radio";
+import { Kart, Pit } from "@prisma/client";
 
 export default function MoveKartModalIdle({
     kart,
@@ -133,7 +132,7 @@ export default function MoveKartModalIdle({
 
                     <div className="space-y-4">
                         {pits.map((x) => (
-                            <div key={x.id} className="flex px-4 py-2 border rounded">
+                            <div key={x.id} className="flex rounded border px-4 py-2">
                                 <Radio
                                     name="status"
                                     value={`pit|${x.id}`}
@@ -142,11 +141,11 @@ export default function MoveKartModalIdle({
                                 />
                                 <div
                                     style={{ backgroundColor: `${x.colorHex}` }}
-                                    className="w-6 min-h-full rounded"
+                                    className="min-h-full w-6 rounded"
                                 />
                             </div>
                         ))}
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 name="status"
                                 value="racing"
@@ -193,7 +192,7 @@ export default function MoveKartModalIdle({
                             <span>Continue</span>
                         </Button>
                     </span>
-                    <span className="flex w-full mt-4 sm:mt-0 sm:w-auto">
+                    <span className="mt-4 flex w-full sm:mt-0 sm:w-auto">
                         <ButtonOutline type="reset" onClick={handleCancelClick}>
                             <IconBan />
                             <span>Cancel</span>

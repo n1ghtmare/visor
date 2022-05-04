@@ -2,9 +2,7 @@ import React, { useState, useRef } from "react";
 
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
-import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
-import Pit from "entities/Pit";
 
 import AvailableEventNosNotice from "components/Shared/AvailableEventNosNotice";
 import Button from "components/Shared/Button";
@@ -16,6 +14,7 @@ import IconStop from "components/Shared/IconStop";
 import Input from "components/Shared/Input";
 import Radio from "components/Shared/Radio";
 import Modal from "components/Shared/Modal";
+import { Kart, Pit } from "@prisma/client";
 
 export default function MoveModalPit({
     kart,
@@ -139,7 +138,7 @@ export default function MoveModalPit({
                         {pits
                             .filter((x) => x.id !== kart.pitId)
                             .map((x) => (
-                                <div key={x.id} className="flex px-4 py-2 border rounded">
+                                <div key={x.id} className="flex rounded border px-4 py-2">
                                     <Radio
                                         name="status"
                                         value={`pit|${x.id}`}
@@ -148,11 +147,11 @@ export default function MoveModalPit({
                                     />
                                     <div
                                         style={{ backgroundColor: `${x.colorHex}` }}
-                                        className="w-6 min-h-full rounded"
+                                        className="min-h-full w-6 rounded"
                                     />
                                 </div>
                             ))}
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 name="status"
                                 value={StatusType.Idle.toString()}
@@ -163,7 +162,7 @@ export default function MoveModalPit({
                                 <IconStop />
                             </div>
                         </div>
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 name="status"
                                 value={StatusType.Racing.toString()}
@@ -210,7 +209,7 @@ export default function MoveModalPit({
                             <span>Continue</span>
                         </Button>
                     </span>
-                    <span className="flex w-full mt-4 sm:mt-0 sm:w-auto">
+                    <span className="mt-4 flex w-full sm:mt-0 sm:w-auto">
                         <ButtonOutline type="reset" onClick={handleCancelClick}>
                             <IconBan />
                             <span>Cancel</span>

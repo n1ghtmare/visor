@@ -4,20 +4,19 @@
     "private": true,
     "scripts": {
         "dev": "npm run migrate-dev && next dev",
-        "build": "next build",
-        "start": "next start -p $PORT",
+        "build": "npm run migrate-prod && next build",
+        "start": "next start",
         "lint": "next lint",
-        "migrate-prod": "node-pg-migrate up --tsconfig ./tsconfig.json --envPath ./.env.production -t migrations --rejectUnauthorized false",
-        "migrate-dev": "node-pg-migrate up --tsconfig ./tsconfig.json --envPath ./.env.development -t migrations"
+        "migrate-prod": "prisma migrate deploy",
+        "migrate-dev": "prisma migrate dev"
     },
     "dependencies": {
+        "@prisma/client": "^3.13.0",
         "@tippyjs/react": "^4.2.5",
         "bcrypt": "^5.0.1",
         "date-fns": "^2.22.1",
         "next": "^11.1.0",
         "next-iron-session": "^4.2.0",
-        "node-pg-migrate": "^5.10.0",
-        "pg": "^8.7.1",
         "react": "^17.0.2",
         "react-colorful": "^5.3.0",
         "react-dom": "^17.0.2",
@@ -42,6 +41,9 @@
         "eslint-plugin-react": "^7.24.0",
         "eslint-plugin-react-hooks": "^4.2.0",
         "postcss": "^8.3.5",
+        "prettier": "^2.6.2",
+        "prettier-plugin-tailwindcss": "^0.1.10",
+        "prisma": "^3.13.0",
         "tailwindcss": "^2.2.4",
         "ts-node": "^8.8.1",
         "typescript": "^4.3.5"

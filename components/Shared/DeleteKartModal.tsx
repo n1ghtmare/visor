@@ -2,13 +2,12 @@ import React, { useRef } from "react";
 
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
-import Kart from "entities/Kart";
-
 import ButtonDanger from "components/Shared/ButtonDanger";
 import ButtonOutline from "components/Shared/ButtonOutline";
 import IconBan from "components/Shared/IconBan";
 import IconExclamationCircle from "components/Shared/IconExclamationCircle";
 import Modal from "components/Shared/Modal";
+import { Kart } from "@prisma/client";
 
 export default function DeleteKartModal(props: {
     kart: Kart;
@@ -47,7 +46,7 @@ export default function DeleteKartModal(props: {
                             <span>Yes, I&apos;m sure!</span>
                         </ButtonDanger>
                     </span>
-                    <span className="flex w-full mt-3 sm:mt-0 sm:w-auto">
+                    <span className="mt-3 flex w-full sm:mt-0 sm:w-auto">
                         <ButtonOutline type="reset" onClick={handleCancelClick}>
                             <IconBan />
                             <span>Cancel</span>

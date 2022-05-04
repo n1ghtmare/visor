@@ -3,12 +3,10 @@ import { NextApiResponse } from "next";
 import withSession, { NextIronRequest } from "helpers/session";
 import { createEvent, createPits, createKarts } from "database/repository";
 
-import Event from "entities/Event";
-import Pit from "entities/Pit";
-import Kart from "entities/Kart";
 import PostEventResponseData from "entities/PostEventResponseData";
 import UserComposite from "entities/UserComposite";
 import PitColorMap from "entities/PitColorMap";
+import { Kart, Pit, Event } from "@prisma/client";
 
 type PostRequestData = {
     name: string;

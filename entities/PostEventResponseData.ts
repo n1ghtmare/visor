@@ -1,6 +1,4 @@
-import Pit from "./Pit";
-import Kart from "./Kart";
-import Event from "./Event";
+import { Kart, Pit, Event } from "@prisma/client";
 
 type PostEventResponseData = {
     event: Event;

@@ -1,8 +1,5 @@
 import { groupedMapByPitId } from "helpers/data";
 
-import Kart from "entities/Kart";
-import Pit from "entities/Pit";
-
 import KartsTable from "./Shared/KartsTable";
 import KartsTableBody from "./Shared/KartsTableBody";
 import KartsTableEmptyRow from "./Shared/KartsTableEmptyRow";
@@ -10,6 +7,7 @@ import KartsTableEmptyRow from "./Shared/KartsTableEmptyRow";
 import KartsTableHeaderPit from "./KartsTablePit/KartsTableHeaderPit";
 import KartsTableRowPit from "./KartsTablePit/KartsTableRowPit";
 import PitBadge from "./KartsTablePit/KartsTableRowPit/PitBadge";
+import { Kart, Pit } from "@prisma/client";
 
 export default function KartsTablePit({
     karts,
@@ -46,7 +44,7 @@ export default function KartsTablePit({
 
             return [
                 <tr key={x.id}>
-                    <td colSpan={8} className="px-6 py-3 bg-gray-50">
+                    <td colSpan={8} className="bg-gray-50 px-6 py-3">
                         <div className="flex items-center space-x-4">
                             <PitBadge name={x.name} colorHex={x.colorHex} />
                             <span className="font-bold text-gray-500">{totalRowsCount}</span>

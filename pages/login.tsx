@@ -77,19 +77,19 @@ export default function Login() {
                     <h1 className="text-4xl font-bold tracking-tight">Login</h1>
 
                     <form
-                        className="mt-16 overflow-hidden bg-white border border-gray-300 rounded-lg shadow divide-y divide-gray-200"
+                        className="mt-16 divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-300 bg-white shadow"
                         onSubmit={handleSubmit(onSubmit)}
                     >
-                        <div className="p-6 space-y-4">
+                        <div className="space-y-4 p-6">
                             {errorMessage && (
-                                <div className="px-4 py-3 text-red-700 bg-red-100 border border-red-400 rounded">
+                                <div className="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
                                     {errorMessage}
                                 </div>
                             )}
 
                             <div>
                                 <div className="flex items-baseline">
-                                    <label className="flex-1 mb-2 font-bold" htmlFor="username">
+                                    <label className="mb-2 flex-1 font-bold" htmlFor="username">
                                         Username
                                     </label>
 
@@ -110,7 +110,7 @@ export default function Login() {
 
                             <div>
                                 <div className="flex items-baseline">
-                                    <label className="flex-1 mb-2 font-bold" htmlFor="password">
+                                    <label className="mb-2 flex-1 font-bold" htmlFor="password">
                                         Password
                                     </label>
 
@@ -129,7 +129,7 @@ export default function Login() {
                                 />
                             </div>
                         </div>
-                        <div className="px-6 py-3 bg-gray-50">
+                        <div className="bg-gray-50 px-6 py-3">
                             <Button type="submit">
                                 <IconLogin />
                                 <span>Login</span>

@@ -4,9 +4,7 @@ import withSession, { NextIronRequest } from "helpers/session";
 import { validateRequestAndGetEvent } from "helpers/api";
 
 import { getKartsByEventId } from "database/repository";
-
-import Event from "entities/Event";
-import Kart from "entities/Kart";
+import { Kart, Event } from "@prisma/client";
 
 async function handleGet(req: NextIronRequest, res: NextApiResponse) {
     const event: Event = await validateRequestAndGetEvent(req, res);

@@ -2,7 +2,7 @@ import useSWR from "swr";
 
 import fetcher from "helpers/fetcher";
 
-import Pit from "entities/Pit";
+import { Pit } from "@prisma/client";
 
 export function usePits(eventId: number) {
     const { data, error, isValidating } = useSWR<Pit[]>(

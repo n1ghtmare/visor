@@ -3,7 +3,7 @@ import { NextApiResponse } from "next";
 import { deleteEvent } from "database/repository";
 import { validateRequestAndGetEvent } from "helpers/api";
 
-import Event from "entities/Event";
+import { Event } from "@prisma/client";
 import withSession, { NextIronRequest } from "helpers/session";
 
 async function handleDelete(req: NextIronRequest, res: NextApiResponse) {

@@ -3,7 +3,6 @@ import React, { useState, useRef } from "react";
 import { useEscCancel, useOutsideRefsClick } from "hooks/UtilityHooks";
 
 import ClassificationType from "entities/ClassificationType";
-import Kart from "entities/Kart";
 
 import Modal from "components/Shared/Modal";
 import Button from "components/Shared/Button";
@@ -12,6 +11,7 @@ import IconBan from "components/Shared/IconBan";
 import IconPlay from "components/Shared/IconPlay";
 import Radio from "components/Shared/Radio";
 import TextArea from "components/Shared/TextArea";
+import { Kart } from "@prisma/client";
 
 export default function EditKartModal({
     kart,
@@ -61,7 +61,7 @@ export default function EditKartModal({
 
                 <div className="mt-6 space-y-6">
                     <div className="space-y-4">
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 value={ClassificationType.SlowAF.toString()}
                                 name="classificationType"
@@ -69,9 +69,9 @@ export default function EditKartModal({
                                 checked={classificationType === ClassificationType.SlowAF}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-yellow-400 rounded" />
+                            <div className="min-h-full w-6 rounded bg-yellow-400" />
                         </div>
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 value={ClassificationType.Normal.toString()}
                                 name="classificationType"
@@ -79,9 +79,9 @@ export default function EditKartModal({
                                 checked={classificationType === ClassificationType.Normal}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-gray-200 rounded" />
+                            <div className="min-h-full w-6 rounded bg-gray-200" />
                         </div>
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 value={ClassificationType.Medium.toString()}
                                 name="classificationType"
@@ -89,9 +89,9 @@ export default function EditKartModal({
                                 checked={classificationType === ClassificationType.Medium}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-blue-400 rounded" />
+                            <div className="min-h-full w-6 rounded bg-blue-400" />
                         </div>
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 value={ClassificationType.Fast.toString()}
                                 name="classificationType"
@@ -99,9 +99,9 @@ export default function EditKartModal({
                                 checked={classificationType === ClassificationType.Fast}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-green-400 rounded" />
+                            <div className="min-h-full w-6 rounded bg-green-400" />
                         </div>
-                        <div className="flex px-4 py-2 border rounded">
+                        <div className="flex rounded border px-4 py-2">
                             <Radio
                                 value={ClassificationType.Epic.toString()}
                                 name="classificationType"
@@ -109,7 +109,7 @@ export default function EditKartModal({
                                 checked={classificationType === ClassificationType.Epic}
                                 onChange={handleClassificationChange}
                             />
-                            <div className="w-6 min-h-full bg-purple-500 rounded" />
+                            <div className="min-h-full w-6 rounded bg-purple-500" />
                         </div>
                     </div>
 
@@ -134,7 +134,7 @@ export default function EditKartModal({
                             <span>Continue</span>
                         </Button>
                     </span>
-                    <span className="flex w-full mt-4 sm:mt-0 sm:w-auto">
+                    <span className="mt-4 flex w-full sm:mt-0 sm:w-auto">
                         <ButtonOutline type="reset" onClick={handleCancelClick}>
                             <IconBan />
                             <span>Cancel</span>

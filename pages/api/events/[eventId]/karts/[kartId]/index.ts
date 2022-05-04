@@ -10,9 +10,8 @@ import {
     deleteKart
 } from "database/repository";
 
-import Event from "entities/Event";
-import Kart from "entities/Kart";
 import StatusType from "entities/StatusType";
+import { Kart, Event } from "@prisma/client";
 
 async function setInitialPitOrderToKartIfNeeded(existingKart: Kart, requestKart: Kart) {
     // We're either moving the kart from another statusType or we're moving from one pit to another, either way we should set the correct pitOrder (max + 1 or 0 + 1.5)

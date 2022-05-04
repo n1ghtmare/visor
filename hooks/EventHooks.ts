@@ -3,7 +3,7 @@ import useSWR from "swr";
 import fetcher from "helpers/fetcher";
 
 import EventComposite from "entities/EventComposite";
-import Event from "entities/Event";
+import { Event } from "@prisma/client";
 
 // we're passing the currentUserId in order to determine whether we should make the call at all
 export function useEventComposites(currentUserId?: number) {
