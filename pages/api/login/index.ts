@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { NextApiResponse } from "next";
 
 import withSession, { NextIronRequest } from "helpers/session";
+import prisma from "helpers/prisma";
 import { getUserByUsername } from "database/repository";
 
 import UserComposite from "entities/UserComposite";
